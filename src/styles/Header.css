@@ -1,0 +1,31 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.auth-buttons button {
+    margin-left: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+
+.login {
+    background-color: #f0f4f4;
+}
+
+.signup {
+    background-color: #fff;
+    border: 1px solid #ccc;
+}

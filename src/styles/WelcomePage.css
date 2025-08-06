@@ -1,0 +1,99 @@
+.welcome-page {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fff;
+    color: #000;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    border-bottom: 1px solid #eee;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.auth-buttons button {
+    margin-left: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.login {
+    background-color: #B0D9E8;
+}
+
+.signup {
+    background-color: #E8F0F2;
+    border: 1px solid #ccc;
+}
+
+.hero {
+    position: relative;
+    text-align: center;
+    margin: 40px;
+}
+
+.hero-image {
+    width: 100%;
+    max-height: 350px;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.hero-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-25%, -50%);
+    color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero-text h1 {
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.hero-text p {
+    font-size: 16px;
+    margin-top: 8px;
+}
+
+.features {
+    padding: 20px;
+}
+
+.features-title {
+    text-align: center;
+}
+
+.features-grid {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.feature-card {
+    flex: 1;
+    border: 1px solid #D4DEE3;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: left;
+    min-width: 240px;
+    max-width: 300px;
+}
+
+.feature-card .icon {
+    width: 24px;
+    height: 24px;
+}
