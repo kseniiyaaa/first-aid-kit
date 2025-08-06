@@ -1,5 +1,5 @@
 .welcome-page {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Lexend', sans-serif;
     background-color: #fff;
     color: #000;
 }
@@ -17,6 +17,10 @@
     font-size: 20px;
 }
 
+.logo-image {
+    margin-right: 10px;
+}
+
 .auth-buttons button {
     margin-left: 12px;
     padding: 8px 16px;
@@ -28,11 +32,12 @@
 
 .login {
     background-color: #B0D9E8;
+    font-family: Lexend, sans-serif;
 }
 
 .signup {
     background-color: #E8F0F2;
-    border: 1px solid #ccc;
+    font-family: Lexend, sans-serif;
 }
 
 .hero {
