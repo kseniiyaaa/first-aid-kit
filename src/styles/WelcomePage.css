@@ -1,5 +1,4 @@
 .welcome-page {
-    font-family: 'Lexend', sans-serif;
     background-color: #fff;
     color: #000;
 }
@@ -32,12 +31,10 @@
 
 .login {
     background-color: #B0D9E8;
-    font-family: Lexend, sans-serif;
 }
 
 .signup {
     background-color: #E8F0F2;
-    font-family: Lexend, sans-serif;
 }
 
 .hero {
