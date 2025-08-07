@@ -1,7 +1,9 @@
 import { Search, Bell, Brain, UserRound } from 'lucide-react';
 import './Header.css';
+import {useAuth} from "../../context/AuthProvider.jsx";
 
-export default function Header({ isLoggedIn = false }) {
+export default function Header() {
+    const { isAuthenticated } = useAuth()
     return (
         <header className="header">
             <div className="logo">
@@ -9,7 +11,7 @@ export default function Header({ isLoggedIn = false }) {
                 MediKit
             </div>
 
-            {isLoggedIn ? (
+            {isAuthenticated ? (
                 // Header for logged in users (HomePage)
                 <div className="header-icons">
                     <div className="search-icon"><Search className="icon" size={window.innerWidth < 768 ? 20 : 24} /></div>

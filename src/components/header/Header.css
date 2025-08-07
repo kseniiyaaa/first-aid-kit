@@ -1,11 +1,19 @@
 /* Header Styles */
 .header {
+    position: fixed;   /* фиксируем блок */
+    top: 0;            /* прижимаем к верху */
+    left: 0;           /* прижимаем к левому краю */
+    right: 0;          /* прижимаем к правому краю */
+    z-index: 1000;     /* поверх другого контента */
+
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
     border-bottom: 1px solid #eee;
+    background: #fff;  /* на случай прозрачности фона */
 }
+
 
 .logo {
     display: flex;

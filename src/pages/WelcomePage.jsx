@@ -1,12 +1,9 @@
 import '../styles/WelcomePage.css'
 import heroImage from '../img/main-img.jpg'
-import Header from '../components/header/Header'
 
 export default function WelcomePage() {
     return (
         <div className="welcome-page">
-            <Header isLoggedIn={false} />
-
             <section className="hero">
                 <img src={heroImage} alt="Medicine" className="hero-image" />
                 <div className="hero-text">

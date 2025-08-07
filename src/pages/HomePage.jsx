@@ -1,12 +1,16 @@
 import { Pill, TrendingDown, Siren } from 'lucide-react';
 import '../styles/HomePage.css'
-import Header from '../components/header/Header'
+import Cookies from "js-cookie";
 
 export default function HomePage() {
+    // for logged-in header
+    // Cookies.set('authToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9....', {
+    //     expires: 7,
+    //     secure: true,
+    //     sameSite: 'strict'
+    // })
     return (
         <div className="medikit-container">
-            <Header isLoggedIn={true} />
-
             <main className="main-content">
                 <h1 className="page-title">Kseniia's MediKit</h1>
 
