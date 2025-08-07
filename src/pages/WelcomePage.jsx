@@ -17,8 +17,7 @@ export default function WelcomePage() {
                 <div className="hero-text">
                     <h1>Welcome to MediKit</h1>
                     <p>
-                        Your personal medicine kit management system. Keep track of your
-                        medications, dosages, and refills with ease.
+                        Your personal medicine kit management system.
                     </p>
                 </div>
             </section>
