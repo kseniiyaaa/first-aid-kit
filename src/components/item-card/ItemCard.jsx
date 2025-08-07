@@ -1,0 +1,52 @@
+import { Pill, TrendingDown, Siren } from 'lucide-react';
+import './ItemCard.css';
+
+export default function ItemCard({ data }) {
+    const renderIcon = () => {
+        switch (data.type) {
+            case 'reminder':
+                return <Pill className="pill-icon" />;
+            case 'stock':
+                return <TrendingDown className="low-stock-icon" />;
+            case 'expiring':
+                return <Siren className="siren-icon" />;
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <div className={`${data.type}-item`}>
+            <div className={`${data.type}-icon`}>{renderIcon()}</div>
+
+            <div className={`${data.type}-details`}>
+                <div className={`${data.type}-name`}>{data.name}</div>
+                {data.subtitle && (
+                    <div
+                        className={
+                            data.type === 'reminder'
+                                ? 'reminder-instruction'
+                                : data.type === 'stock'
+                                    ? 'stock-quantity'
+                                    : ''
+                        }
+                    >
+                        {data.subtitle}
+                    </div>
+                )}
+            </div>
+
+            {data.type === 'reminder' && data.dateOrTime && (
+                <div className="reminder-time">{data.dateOrTime}</div>
+            )}
+
+            {data.type === 'stock' && data.buttonText && (
+                <button className="reorder-btn">{data.buttonText}</button>
+            )}
+
+            {data.type === 'expiring' && data.dateOrTime && (
+                <div className="expiration-date">{data.dateOrTime}</div>
+            )}
+        </div>
+    );
+}
