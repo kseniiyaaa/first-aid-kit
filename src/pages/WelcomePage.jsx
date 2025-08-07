@@ -1,16 +1,11 @@
 import '../styles/WelcomePage.css'
 import heroImage from '../img/main-img.jpg'
+import Header from '../components/header/Header'
 
 export default function WelcomePage() {
     return (
         <div className="welcome-page">
-            <header className="header">
-                <div className="logo"><img src="/src/img/logo.svg" alt="MediKit Logo" className="logo-image" />MediKit</div>
-                <div className="auth-buttons">
-                    <button className="login">Login</button>
-                    <button className="signup">Sign Up</button>
-                </div>
-            </header>
+            <Header isLoggedIn={false} />
 
             <section className="hero">
                 <img src={heroImage} alt="Medicine" className="hero-image" />

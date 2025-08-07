@@ -1,0 +1,342 @@
+/* Main Content */
+.main-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 16px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/* Quick Actions */
+.quick-actions {
+    margin-bottom: 32px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-rounded {
+    border-radius: 25px;
+}
+
+.btn-primary {
+    background-color: #7dd3fc;
+    color: #0c4a6e;
+}
+
+.btn-primary:hover {
+    background-color: #38bdf8;
+}
+
+.btn-secondary {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.btn-secondary:hover {
+    background-color: #dee2e6;
+}
+
+.btn-view-kit {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.btn-view-kit:hover {
+    background-color: #e9ecef;
+    color: #343a40;
+}
+
+/* Kit Summary */
+.kit-summary {
+    margin-bottom: 32px;
+}
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.summary-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-label {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 8px;
+}
+
+.card-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #212529;
+}
+
+/* Upcoming Reminders */
+.upcoming-reminders {
+    margin-bottom: 32px;
+}
+
+.reminder-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.reminder-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reminder-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pill-icon {
+    width: 20px;
+    height: 20px;
+    color: hotpink;
+}
+
+.reminder-details {
+    flex: 1;
+}
+
+.reminder-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 4px;
+}
+
+.reminder-instruction {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.reminder-time {
+    font-size: 14px;
+    color: #6c757d;
+    text-align: right;
+}
+
+/* Low Stock */
+.low-stock {
+    margin-bottom: 32px;
+}
+
+.stock-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stock-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stock-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.low-stock-icon {
+    width: 20px;
+    height: 20px;
+    color: teal;
+}
+
+.stock-details {
+    flex: 1;
+}
+
+.stock-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 4px;
+}
+
+.stock-quantity {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.reorder-btn {
+    padding: 8px 16px;
+    background-color: transparent;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reorder-btn:hover {
+    background-color: #f8f9fa;
+    color: #495057;
+}
+
+/* Expiring Soon */
+.expiration-soon {
+    margin-bottom: 32px;
+}
+
+.expire-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.expiring-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.expire-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.siren-icon {
+    width: 20px;
+    height: 20px;
+    color: #dc3545;
+}
+
+.expire-details {
+    flex: 1;
+}
+
+.expire-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 4px;
+}
+
+.expiration-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: #dc3545;
+    text-align: right;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 24px 16px;
+    }
+
+    .quick-actions {
+        margin-bottom: 20px;
+    }
+
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .reminder-item,
+    .stock-item,
+    .expiring-item {
+        padding: 15px;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .reminder-instruction, .stock-quantity {
+        font-size: 12px;
+    }
+
+    .reminder-time {
+        text-align: left;
+    }
+}

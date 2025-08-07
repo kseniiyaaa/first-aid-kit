@@ -1,0 +1,77 @@
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    border-bottom: 1px solid #eee;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 20px;
+    cursor: default;
+}
+
+.logo-image {
+    margin-right: 10px;
+}
+
+/* Auth buttons for welcome page */
+.auth-buttons button {
+    margin-left: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.login {
+    background-color: #B0D9E8;
+}
+
+.login:hover {
+    background-color: #9CCDE6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(176, 217, 232, 0.3);
+}
+
+.signup {
+    background-color: #E8F0F2;
+}
+
+.signup:hover {
+    background-color: #D9E8ED;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(232, 240, 242, 0.3);
+}
+
+/* Header icons for logged in users */
+.header-icons {
+    display: flex;
+    gap: 25px;
+}
+
+.header-icons .icon {
+    color: #000000;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.header-icons .icon:hover {
+    color: #495057;
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 10px;
+    }
+
+    .header-icons {
+        gap: 15px;
+    }
+}
