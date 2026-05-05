@@ -1,9 +1,12 @@
 import { Search, Bell, Brain, UserRound } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import './Header.css';
-import {useAuth} from "../../context/AuthProvider.jsx";
+import { useAuth } from "../../context/AuthProvider.jsx";
 
 export default function Header() {
-    const { isAuthenticated } = useAuth()
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+
     return (
         <header className="header">
             <div className="logo">
@@ -22,8 +25,8 @@ export default function Header() {
             ) : (
                 // Header for welcome page (not logged in)
                 <div className="auth-buttons">
-                    <button className="login">Login</button>
-                    <button className="signup">Sign Up</button>
+                    <button className="login" onClick={() => navigate('/login')}>Login</button>
+                    <button className="signup" onClick={() => navigate('/signup')}>Sign Up</button>
                 </div>
             )}
         </header>

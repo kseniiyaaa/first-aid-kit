@@ -30,6 +30,47 @@
     border-radius: 12px;
     border: 1px solid #e9ecef;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.2s;
+}
+
+.reminder-item.reminder-taken {
+    opacity: 0.55;
+}
+
+.reminder-item.reminder-taken .reminder-name,
+.reminder-item.reminder-taken .reminder-time {
+    text-decoration: line-through;
+    text-decoration-color: #6c757d;
+    text-decoration-thickness: 1.5px;
+}
+
+.reminder-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #D4DEE3;
+    background: transparent;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    color: #0D171C;
+    transition: background 0.15s, border-color 0.15s, transform 0.08s;
+}
+
+.reminder-checkbox:hover {
+    border-color: #30BDE8;
+}
+
+.reminder-checkbox:active {
+    transform: scale(0.92);
+}
+
+.reminder-checkbox.reminder-checkbox-checked {
+    background-color: #30BDE8;
+    border-color: #30BDE8;
 }
 
 .reminder-icon {

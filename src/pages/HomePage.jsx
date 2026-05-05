@@ -1,8 +1,14 @@
+import { useState } from 'react';
 import '../styles/HomePage.css';
-import Cookies from 'js-cookie';
 import ItemCard from "../components/item-card/ItemCard.jsx";
 
 export default function HomePage() {
+    const [takenReminders, setTakenReminders] = useState({});
+
+    const toggleReminder = (name) => {
+        setTakenReminders(prev => ({ ...prev, [name]: !prev[name] }));
+    };
+
     const reminders = [
         { type: 'reminder', name: 'Ibuprofen', subtitle: 'Take 1 tablet', dateOrTime: 'Today, 8:00 AM' },
         { type: 'reminder', name: 'Vitamin D', subtitle: 'Take 2 capsules', dateOrTime: 'Tomorrow, 9:00 AM' },
@@ -20,12 +26,7 @@ export default function HomePage() {
         { type: 'expiring', name: 'Betaferon', dateOrTime: '25.08.2025' },
         { type: 'expiring', name: 'Fanigan', dateOrTime: '27.08.2025' },
     ];
-// for logged-in header
-    // Cookies.set('authToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9....', {
-    //     expires: 7,
-    //     secure: true,
-    //     sameSite: 'strict'
-    // })
+
     return (
         <div className="medikit-container">
             <main className="main-content">
@@ -64,7 +65,12 @@ export default function HomePage() {
                     <h2 className="section-title">Upcoming Reminders</h2>
                     <div className="reminder-list">
                         {reminders.map((item, i) => (
-                            <ItemCard key={i} data={item} />
+                            <ItemCard
+                                key={i}
+                                data={item}
+                                isDone={!!takenReminders[item.name]}
+                                onToggle={() => toggleReminder(item.name)}
+                            />
                         ))}
                     </div>
                 </section>

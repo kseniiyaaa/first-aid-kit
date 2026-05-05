@@ -1,7 +1,7 @@
-import { Pill, TrendingDown, Siren } from 'lucide-react';
+import { Pill, TrendingDown, Siren, Check } from 'lucide-react';
 import './ItemCard.css';
 
-export default function ItemCard({ data }) {
+export default function ItemCard({ data, isDone, onToggle }) {
     const renderIcon = () => {
         switch (data.type) {
             case 'reminder':
@@ -16,7 +16,19 @@ export default function ItemCard({ data }) {
     };
 
     return (
-        <div className={`${data.type}-item`}>
+        <div className={`${data.type}-item${isDone ? ' reminder-taken' : ''}`}>
+            {data.type === 'reminder' && (
+                <button
+                    className={`reminder-checkbox${isDone ? ' reminder-checkbox-checked' : ''}`}
+                    role="checkbox"
+                    aria-checked={isDone}
+                    aria-label={`Mark ${data.name} as taken`}
+                    onClick={(e) => { e.stopPropagation(); onToggle?.(); }}
+                >
+                    {isDone && <Check size={12} strokeWidth={3} />}
+                </button>
+            )}
+
             <div className={`${data.type}-icon`}>{renderIcon()}</div>
 
             <div className={`${data.type}-details`}>
