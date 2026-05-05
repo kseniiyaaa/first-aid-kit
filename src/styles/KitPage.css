@@ -1,0 +1,106 @@
+/* Kit Page */
+.kit-page-container {
+    max-width: 800px;
+    margin: 50px auto 0;
+    padding: 32px 24px;
+}
+
+.kit-page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 20px;
+}
+
+.kit-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.kit-item-count {
+    font-size: 14px;
+    color: #4F8796;
+}
+
+.kit-add-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: #B0D9E8;
+    color: #212529;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+
+.kit-add-button:hover {
+    filter: brightness(0.96);
+}
+
+.kit-medicine-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.kit-medicine-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+}
+
+.kit-medicine-item:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.kit-medicine-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.kit-medicine-details {
+    flex: 1;
+}
+
+.kit-medicine-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 4px;
+}
+
+.kit-medicine-meta {
+    font-size: 14px;
+    color: #4F8796;
+}
+
+@media (max-width: 768px) {
+    .kit-page-container {
+        padding: 24px 16px;
+    }
+
+    .kit-medicine-item {
+        padding: 12px;
+        gap: 12px;
+    }
+}

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 
-const AuthContext = createContext({ isAuthenticated: false })
+const AuthContext = createContext({ isAuthenticated: false, login: () => {}, logout: () => {} })
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -11,8 +11,18 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(!!token)
     }, [])
 
+    const login = () => {
+        Cookies.set('authToken', 'mock-token', { expires: 7 })
+        setIsAuthenticated(true)
+    }
+
+    const logout = () => {
+        Cookies.remove('authToken')
+        setIsAuthenticated(false)
+    }
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated }}>
+        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
             {children}
         </AuthContext.Provider>
     )

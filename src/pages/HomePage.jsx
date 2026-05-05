@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/HomePage.css';
 import ItemCard from "../components/item-card/ItemCard.jsx";
 
 export default function HomePage() {
+    const navigate = useNavigate();
     const [takenReminders, setTakenReminders] = useState({});
 
     const toggleReminder = (name) => {
@@ -43,7 +45,7 @@ export default function HomePage() {
                 <section className="kit-summary">
                     <div className="section-header">
                         <h2 className="section-title">Kit Summary</h2>
-                        <button className="btn btn-view-kit">View kit</button>
+                        <button className="btn btn-view-kit" onClick={() => navigate('/kit')}>View kit</button>
                     </div>
                     <div className="summary-cards">
                         <div className="summary-card">

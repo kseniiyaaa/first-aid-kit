@@ -19,8 +19,10 @@ export default function Header() {
                 <div className="header-icons">
                     <div className="search-icon"><Search className="icon" size={window.innerWidth < 768 ? 20 : 24} /></div>
                     <div className="notification-icon"><Bell className="icon" size={window.innerWidth < 768 ? 20 : 24} /></div>
-                    <div className="ai-icon"><Brain className="icon" size={window.innerWidth < 768 ? 20 : 24} /></div>
-                    <div className="profile-icon"><UserRound className="icon" size={window.innerWidth < 768 ? 20 : 24} /></div>
+                    {/*<div className="ai-icon"><Brain className="icon" size={window.innerWidth < 768 ? 20 : 24} /></div>*/}
+                    <div className="profile-icon" onClick={() => navigate('/account')} style={{ cursor: 'pointer' }}>
+                        <UserRound className="icon" size={window.innerWidth < 768 ? 20 : 24} />
+                    </div>
                 </div>
             ) : (
                 // Header for welcome page (not logged in)

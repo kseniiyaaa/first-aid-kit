@@ -3,6 +3,8 @@ import WelcomePage from './pages/WelcomePage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
+import KitPage from './pages/KitPage.jsx'
+import AccountPage from './pages/AccountPage.jsx'
 
 function App() {
     return (
@@ -11,6 +13,8 @@ function App() {
             <Route path="/home" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/kit" element={<KitPage />} />
+            <Route path="/account" element={<AccountPage />} />
         </Routes>
     )
 }

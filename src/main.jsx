@@ -8,8 +8,9 @@ import Layout from "./layout.jsx";
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <BrowserRouter>
-            <Layout />
-            <App />
+            <Layout>
+                <App />
+            </Layout>
         </BrowserRouter>
     </React.StrictMode>
 )

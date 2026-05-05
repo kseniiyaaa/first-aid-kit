@@ -1,0 +1,128 @@
+/* Account Page */
+.account-page-container {
+    max-width: 800px;
+    margin: 50px auto 0;
+    padding: 32px 24px;
+}
+
+.account-page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 8px;
+}
+
+.account-profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.account-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background-color: #D4DEE3;
+}
+
+.account-display-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #212529;
+}
+
+.account-user-email {
+    font-size: 14px;
+    color: #4F8796;
+}
+
+.account-section {
+    margin-bottom: 32px;
+}
+
+.account-section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 16px;
+}
+
+.account-input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.account-input-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #212529;
+}
+
+.account-input {
+    width: 100%;
+    height: 56px;
+    border-radius: 12px;
+    background-color: #E8F0F2;
+    border: none;
+    padding: 0 16px;
+    font-family: inherit;
+    font-size: 16px;
+    color: #212529;
+    outline: none;
+}
+
+.account-input:focus {
+    outline: 2px solid #30BDE8;
+    outline-offset: 2px;
+}
+
+.account-action-row {
+    display: flex;
+    gap: 12px;
+    padding: 4px 0;
+}
+
+.account-change-button {
+    padding: 10px 20px;
+    background-color: #E8F0F2;
+    color: #212529;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+
+.account-change-button:hover {
+    filter: brightness(0.96);
+}
+
+.account-logout-button {
+    padding: 10px 20px;
+    background-color: #FB5D60;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+
+.account-logout-button:hover {
+    filter: brightness(0.96);
+}
+
+@media (max-width: 768px) {
+    .account-page-container {
+        padding: 24px 16px;
+    }
+}

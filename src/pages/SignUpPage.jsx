@@ -1,8 +1,15 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthProvider.jsx';
 import '../styles/AuthPage.css';
 
 export default function SignUpPage() {
     const navigate = useNavigate();
+    const { login } = useAuth();
+
+    const handleSignUp = () => {
+        login();
+        navigate('/home');
+    };
 
     return (
         <div className="auth-page">
@@ -23,7 +30,7 @@ export default function SignUpPage() {
                 </div>
 
                 <div className="auth-input-field">
-                    <button className="auth-submit-button" onClick={() => navigate('/home')}>
+                    <button className="auth-submit-button" onClick={handleSignUp}>
                         Sign Up
                     </button>
                 </div>
