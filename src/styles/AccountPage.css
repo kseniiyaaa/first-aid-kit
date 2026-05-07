@@ -81,9 +81,71 @@
     outline-offset: 2px;
 }
 
+.account-input--invalid {
+    outline: 2px solid #FB5D60;
+    outline-offset: 2px;
+}
+
+/* Password field with eye toggle */
+.account-password-wrapper {
+    position: relative;
+}
+
+.account-password-wrapper .account-input {
+    padding-right: 48px;
+}
+
+.account-password-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #4F8796;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+}
+
+.account-password-toggle:hover {
+    color: #212529;
+}
+
+/* Field error and success messages */
+.account-field-error {
+    font-size: 13px;
+    color: #FB5D60;
+    padding: 0 4px;
+    margin-top: -4px;
+}
+
+.account-section-feedback {
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin-top: 4px;
+    display: inline-block;
+}
+
+.account-section-feedback--success {
+    color: #1a9e5c;
+    background-color: rgba(26, 158, 92, 0.1);
+}
+
+.account-section-feedback--error {
+    color: #FB5D60;
+    background-color: rgba(251, 93, 96, 0.1);
+}
+
+/* Action buttons */
 .account-action-row {
     display: flex;
+    align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
     padding: 4px 0;
 }
 
@@ -102,6 +164,11 @@
 
 .account-change-button:hover {
     filter: brightness(0.96);
+}
+
+.account-change-button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
 }
 
 .account-logout-button {

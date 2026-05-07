@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/HomePage.css';
 import ItemCard from "../components/item-card/ItemCard.jsx";
+import { useAuth } from '../context/AuthProvider.jsx';
 
 export default function HomePage() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [takenReminders, setTakenReminders] = useState({});
 
     const toggleReminder = (name) => {
@@ -32,7 +34,7 @@ export default function HomePage() {
     return (
         <div className="medikit-container">
             <main className="main-content">
-                <h1 className="page-title">Kseniia's MediKit</h1>
+                <h1 className="page-title">{user?.fullName ? `${user.fullName}'s MediKit` : 'My MediKit'}</h1>
 
                 <section className="quick-actions">
                     <h2 className="section-title">Quick Actions</h2>

@@ -117,6 +117,35 @@
     text-decoration: underline;
 }
 
+/* Validation states */
+.auth-input--invalid {
+    outline: 2px solid #FB5D60;
+    outline-offset: 2px;
+}
+
+.auth-field-error {
+    font-size: 13px;
+    color: #FB5D60;
+    padding: 0 4px;
+    margin-top: -6px;
+}
+
+.auth-server-error {
+    margin: 0 16px 4px;
+    padding: 12px 16px;
+    background-color: rgba(251, 93, 96, 0.1);
+    border-radius: 10px;
+    color: #FB5D60;
+    font-size: 14px;
+    text-align: center;
+}
+
+.auth-submit-button:disabled,
+.auth-ghost-button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
     .auth-page {
         align-items: flex-start;
