@@ -9,7 +9,11 @@ export default function Header() {
 
     return (
         <header className="header">
-            <div className="logo">
+            <div
+                className="logo"
+                onClick={isAuthenticated ? () => navigate('/home') : undefined}
+                style={{ cursor: isAuthenticated ? 'pointer' : 'default' }}
+            >
                 <img src="/src/img/logo.svg" alt="MediKit Logo" className="logo-image" />
                 MediKit
             </div>

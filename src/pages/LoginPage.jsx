@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthProvider.jsx';
 import '../styles/AuthPage.css';
 
@@ -11,6 +12,7 @@ export default function LoginPage() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});
     const [serverError, setServerError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -87,15 +89,25 @@ export default function LoginPage() {
                 </div>
 
                 <div className="auth-input-field">
-                    <input
-                        className={`auth-input${errors.password ? ' auth-input--invalid' : ''}`}
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        disabled={isLoading}
-                    />
+                    <div className="auth-password-wrapper">
+                        <input
+                            className={`auth-input${errors.password ? ' auth-input--invalid' : ''}`}
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            disabled={isLoading}
+                        />
+                        <button
+                            type="button"
+                            className="auth-password-toggle"
+                            onClick={() => setShowPassword((v) => !v)}
+                            tabIndex={-1}
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
                     {errors.password && <span className="auth-field-error">{errors.password}</span>}
                 </div>
 

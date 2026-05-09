@@ -1,0 +1,178 @@
+/* Add Pill Page */
+.add-pill-container {
+    max-width: 800px;
+    margin: 50px auto 0;
+    padding: 32px 24px;
+}
+
+.add-pill-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 28px;
+}
+
+/* Form */
+.pill-form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pill-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 0;
+}
+
+.pill-form-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #212529;
+}
+
+.pill-form-required {
+    color: #FB5D60;
+}
+
+.pill-form-input {
+    width: 90%;
+    height: 52px;
+    border-radius: 12px;
+    background-color: #E8F0F2;
+    border: none;
+    padding: 0 16px;
+    font-family: inherit;
+    font-size: 16px;
+    color: #212529;
+    outline: none;
+}
+
+.pill-form-input:focus {
+    outline: 2px solid #30BDE8;
+    outline-offset: 2px;
+}
+
+.pill-form-input--invalid {
+    outline: 2px solid #FB5D60;
+    outline-offset: 2px;
+}
+
+.pill-form-input::placeholder {
+    color: #9bb5bc;
+}
+
+.pill-form-select {
+    width: 90%;
+    height: 52px;
+    border-radius: 12px;
+    background-color: #E8F0F2;
+    border: none;
+    padding: 0 16px;
+    font-family: inherit;
+    font-size: 16px;
+    color: #212529;
+    outline: none;
+    cursor: pointer;
+    appearance: auto;
+}
+
+.pill-form-select:focus {
+    outline: 2px solid #30BDE8;
+    outline-offset: 2px;
+}
+
+.pill-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.pill-form-textarea {
+    width: 90%;
+    border-radius: 12px;
+    background-color: #E8F0F2;
+    border: none;
+    padding: 14px 16px;
+    font-family: inherit;
+    font-size: 15px;
+    color: #212529;
+    outline: none;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.5;
+}
+
+.pill-form-textarea:focus {
+    outline: 2px solid #30BDE8;
+    outline-offset: 2px;
+}
+
+.pill-form-textarea::placeholder {
+    color: #9bb5bc;
+}
+
+.pill-form-field-error {
+    font-size: 13px;
+    color: #FB5D60;
+    padding: 0 4px;
+}
+
+.pill-form-server-error {
+    padding: 12px 16px;
+    background-color: rgba(251, 93, 96, 0.1);
+    border-radius: 10px;
+    color: #FB5D60;
+    font-size: 14px;
+    margin: 8px 0;
+}
+
+/* Actions */
+.pill-form-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 16px;
+}
+
+.pill-form-submit-button {
+    padding: 12px 28px;
+    background-color: #30BDE8;
+    color: #0D171C;
+    border: none;
+    border-radius: 24px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.08s;
+}
+
+.pill-form-submit-button:hover { filter: brightness(0.96); }
+.pill-form-submit-button:active { transform: scale(0.98); }
+
+.pill-form-submit-button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.pill-form-cancel-button {
+    padding: 12px 28px;
+    background-color: #E8F0F2;
+    color: #212529;
+    border: none;
+    border-radius: 24px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+
+.pill-form-cancel-button:hover { filter: brightness(0.96); }
+.pill-form-cancel-button:disabled { opacity: 0.65; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+    .add-pill-container { padding: 24px 16px; }
+    .pill-form-row { grid-template-columns: 1fr; gap: 0; }
+}

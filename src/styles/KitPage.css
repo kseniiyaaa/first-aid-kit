@@ -94,6 +94,54 @@
     color: #4F8796;
 }
 
+/* Loading & empty states */
+.kit-loading {
+    padding: 48px 0;
+    text-align: center;
+    font-size: 15px;
+    color: #4F8796;
+}
+
+.kit-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 64px 24px;
+    text-align: center;
+}
+
+.kit-empty-icon {
+    font-size: 48px;
+    line-height: 1;
+}
+
+.kit-empty-message {
+    font-size: 16px;
+    color: #4F8796;
+    max-width: 280px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.kit-add-first-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background-color: #30BDE8;
+    color: #0D171C;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+
+.kit-add-first-button:hover { filter: brightness(0.96); }
+
 @media (max-width: 768px) {
     .kit-page-container {
         padding: 24px 16px;

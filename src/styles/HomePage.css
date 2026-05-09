@@ -115,6 +115,14 @@
 }
 
 
+/* Empty states */
+.section-empty-state {
+    font-size: 14px;
+    color: #6c757d;
+    padding: 12px 4px;
+    margin: 0;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .main-content {
