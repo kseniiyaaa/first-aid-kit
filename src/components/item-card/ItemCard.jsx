@@ -52,9 +52,6 @@ export default function ItemCard({ data, isDone, onToggle }) {
                 <div className="reminder-time">{data.dateOrTime}</div>
             )}
 
-            {data.type === 'stock' && data.buttonText && (
-                <button className="reorder-btn">{data.buttonText}</button>
-            )}
 
             {data.type === 'expiring' && data.dateOrTime && (
                 <div className="expiration-date">{data.dateOrTime}</div>

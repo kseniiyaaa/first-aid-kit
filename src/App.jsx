@@ -8,19 +8,25 @@ import AccountPage      from './pages/AccountPage.jsx'
 import AddDecisionPage  from './pages/AddDecisionPage.jsx'
 import AddPillPage      from './pages/AddPillPage.jsx'
 import PillPage         from './pages/PillPage.jsx'
+import VerifyEmailPage  from './pages/VerifyEmailPage.jsx'
+import ProtectedRoute   from './components/ProtectedRoute.jsx'
 
 function App() {
     return (
         <Routes>
-            <Route path="/"           element={<WelcomePage />} />
-            <Route path="/home"       element={<HomePage />} />
-            <Route path="/login"      element={<LoginPage />} />
-            <Route path="/signup"     element={<SignUpPage />} />
-            <Route path="/kit"        element={<KitPage />} />
-            <Route path="/account"    element={<AccountPage />} />
-            <Route path="/add"        element={<AddDecisionPage />} />
-            <Route path="/add/manual" element={<AddPillPage />} />
-            <Route path="/pill/:id"   element={<PillPage />} />
+            {/* Public routes */}
+            <Route path="/"             element={<WelcomePage />} />
+            <Route path="/login"        element={<LoginPage />} />
+            <Route path="/signup"       element={<SignUpPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+
+            {/* Protected routes — redirect to /login if not authenticated */}
+            <Route path="/home"       element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+            <Route path="/kit"        element={<ProtectedRoute><KitPage /></ProtectedRoute>} />
+            <Route path="/account"    element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+            <Route path="/add"        element={<ProtectedRoute><AddDecisionPage /></ProtectedRoute>} />
+            <Route path="/add/manual" element={<ProtectedRoute><AddPillPage /></ProtectedRoute>} />
+            <Route path="/pill/:id"   element={<ProtectedRoute><PillPage /></ProtectedRoute>} />
         </Routes>
     )
 }

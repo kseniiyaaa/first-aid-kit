@@ -50,7 +50,6 @@ export default function HomePage() {
             type: 'stock',
             name: m.name,
             subtitle: `${m.quantity} ${m.unit || 'units'} remaining`,
-            buttonText: 'Reorder',
         }));
 
     const expiringSoonItems = medicines

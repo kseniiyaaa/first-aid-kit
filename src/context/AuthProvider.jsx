@@ -11,6 +11,7 @@ const AuthContext = createContext({
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [isInitialized, setIsInitialized] = useState(false)
     const [user, setUser] = useState(null)
 
     useEffect(() => {
@@ -20,6 +21,7 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(true)
             setUser(JSON.parse(storedUser))
         }
+        setIsInitialized(true)
     }, [])
 
     const login = (token, userData) => {
@@ -43,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, updateUser }}>
+        <AuthContext.Provider value={{ isAuthenticated, isInitialized, user, login, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     )

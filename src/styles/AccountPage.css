@@ -37,6 +37,14 @@
 .account-user-email {
     font-size: 14px;
     color: #4F8796;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.account-email-verified-icon {
+    color: #1a9e5c;
+    flex-shrink: 0;
 }
 
 .account-section {
@@ -139,6 +147,64 @@
     color: #FB5D60;
     background-color: rgba(251, 93, 96, 0.1);
 }
+
+/* Email section — current email row + badges */
+.account-current-email-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.account-current-email-label {
+    font-size: 13px;
+    color: #4F8796;
+    font-weight: 500;
+}
+
+.account-current-email-value {
+    font-size: 14px;
+    color: #212529;
+}
+
+.account-email-badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+
+.account-email-badge--verified {
+    background-color: rgba(26, 158, 92, 0.12);
+    color: #1a9e5c;
+}
+
+.account-email-badge--unverified {
+    background-color: rgba(251, 93, 96, 0.1);
+    color: #FB5D60;
+}
+
+.account-unverified-notice {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 4px;
+    line-height: 1.5;
+}
+
+.account-resend-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    font-family: inherit;
+    color: #30BDE8;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.account-resend-link:hover { color: #1da8d1; }
+.account-resend-link:disabled { opacity: 0.65; cursor: not-allowed; }
 
 /* Action buttons */
 .account-action-row {

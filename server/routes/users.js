@@ -1,24 +1,34 @@
+const crypto  = require('crypto');
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const pool = require('../db');
+const bcrypt  = require('bcryptjs');
+const pool    = require('../db');
+
 const { requireAuth } = require('../middleware/auth');
-const { findById, findByEmail, updateName, updateEmail, updatePassword } = require('../models/User');
+const { findById, findByEmail, updateName, updatePassword, setPendingEmail } = require('../models/User');
+const { sendEmailChangeEmail } = require('../utils/email');
 
 const router = express.Router();
 
-// GET /api/users/me
+const appUrl = () => process.env.APP_URL || 'http://localhost:5173';
+
+// ── GET /api/users/me ─────────────────────────────────────────────────────────
 router.get('/me', requireAuth, async (req, res) => {
     try {
         const user = await findById(req.userId);
         if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json({ id: user.id, fullName: user.full_name, email: user.email });
+        res.json({
+            id:            user.id,
+            fullName:      user.full_name,
+            email:         user.email,
+            emailVerified: !!user.is_email_verified,
+        });
     } catch (err) {
         console.error('Get user error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
 
-// PUT /api/users/name
+// ── PUT /api/users/name ───────────────────────────────────────────────────────
 router.put('/name', requireAuth, async (req, res) => {
     try {
         const { fullName } = req.body;
@@ -35,7 +45,9 @@ router.put('/name', requireAuth, async (req, res) => {
     }
 });
 
-// PUT /api/users/email
+// ── PUT /api/users/email ──────────────────────────────────────────────────────
+// Does NOT update the email immediately — sends a verification email to the new
+// address and stores it as pending_email. Email changes after the user confirms.
 router.put('/email', requireAuth, async (req, res) => {
     try {
         const { email } = req.body;
@@ -45,20 +57,43 @@ router.put('/email', requireAuth, async (req, res) => {
             return res.status(400).json({ error: 'Enter a valid email address' });
         }
 
+        const currentUser = await findById(req.userId);
+        if (!currentUser) return res.status(404).json({ error: 'User not found' });
+
+        if (currentUser.email === email.trim()) {
+            return res.status(400).json({ error: 'This is already your current email address' });
+        }
+
         const existing = await findByEmail(email.trim());
         if (existing && existing.id !== req.userId) {
             return res.status(409).json({ error: 'Email is already in use' });
         }
 
-        const user = await updateEmail(req.userId, email.trim());
-        res.json({ id: user.id, fullName: user.full_name, email: user.email });
+        const token   = crypto.randomBytes(32).toString('hex');
+        const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        await setPendingEmail(req.userId, email.trim(), token, expires);
+
+        await sendEmailChangeEmail({
+            to:        email.trim(),
+            name:      currentUser.full_name,
+            verifyUrl: `${appUrl()}/verify-email?token=${token}`,
+        });
+
+        res.json({ message: 'Confirmation email sent to the new address. Check your inbox.' });
     } catch (err) {
-        console.error('Update email error:', err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Update email error:', err.message || err);
+        // Give a friendlier message if it's an email-sending failure
+        const isMailError = err.code === 'ECONNECTION' || err.code === 'EAUTH' || err.responseCode;
+        res.status(500).json({
+            error: isMailError
+                ? 'Failed to send confirmation email. Check server email settings.'
+                : 'Server error',
+        });
     }
 });
 
-// PUT /api/users/password
+// ── PUT /api/users/password ───────────────────────────────────────────────────
 router.put('/password', requireAuth, async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
