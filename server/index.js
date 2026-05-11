@@ -7,6 +7,7 @@ const userRoutes = require('./routes/users');
 const medicineRoutes = require('./routes/medicines');
 const { createUsersTable } = require('./models/User');
 const { createMedicinesTable } = require('./models/Medicine');
+const { createPasswordResetTokensTable } = require('./models/PasswordResetToken');
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.use('/api/medicines', medicineRoutes);
 
 const PORT = process.env.PORT || 3001;
 
-Promise.all([createUsersTable(), createMedicinesTable()])
+Promise.all([createUsersTable(), createMedicinesTable(), createPasswordResetTokensTable()])
     .then(() => {
         app.listen(PORT, () => {
             console.log(`Server running on http://localhost:${PORT}`);

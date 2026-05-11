@@ -8,8 +8,10 @@ import AccountPage      from './pages/AccountPage.jsx'
 import AddDecisionPage  from './pages/AddDecisionPage.jsx'
 import AddPillPage      from './pages/AddPillPage.jsx'
 import PillPage         from './pages/PillPage.jsx'
-import VerifyEmailPage  from './pages/VerifyEmailPage.jsx'
-import ProtectedRoute   from './components/ProtectedRoute.jsx'
+import VerifyEmailPage      from './pages/VerifyEmailPage.jsx'
+import ForgotPasswordPage   from './pages/ForgotPasswordPage.jsx'
+import ResetPasswordPage    from './pages/ResetPasswordPage.jsx'
+import ProtectedRoute       from './components/ProtectedRoute.jsx'
 
 function App() {
     return (
@@ -18,7 +20,9 @@ function App() {
             <Route path="/"             element={<WelcomePage />} />
             <Route path="/login"        element={<LoginPage />} />
             <Route path="/signup"       element={<SignUpPage />} />
-            <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/verify-email"    element={<VerifyEmailPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password"  element={<ResetPasswordPage />} />
 
             {/* Protected routes — redirect to /login if not authenticated */}
             <Route path="/home"       element={<ProtectedRoute><HomePage /></ProtectedRoute>} />

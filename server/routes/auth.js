@@ -3,9 +3,10 @@ const express = require('express');
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
 
-const { findByEmail, findById, createUser, setVerificationToken, consumeVerificationToken } = require('../models/User');
+const { findByEmail, findById, createUser, updatePassword, setVerificationToken, consumeVerificationToken } = require('../models/User');
 const { requireAuth } = require('../middleware/auth');
-const { sendVerificationEmail } = require('../utils/email');
+const { sendVerificationEmail, sendPasswordResetEmail } = require('../utils/email');
+const { createResetToken, findValidToken, markTokenUsed } = require('../models/PasswordResetToken');
 
 const router = express.Router();
 
@@ -150,6 +151,79 @@ router.post('/resend-verification', requireAuth, async (req, res) => {
         res.json({ message: 'Verification email sent. Check your inbox.' });
     } catch (err) {
         console.error('Resend verification error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// ── POST /api/auth/forgot-password ───────────────────────────────────────────
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ error: 'Email is required' });
+
+        // Always return the same message — never reveal whether the email exists
+        const user = await findByEmail(email.trim().toLowerCase());
+        if (user) {
+            const { token, expires } = makeToken();
+            await createResetToken(user.id, token, expires);
+
+            sendPasswordResetEmail({
+                to:       user.email,
+                name:     user.full_name,
+                resetUrl: `${appUrl()}/reset-password?token=${token}`,
+            }).catch((err) => console.error('Password reset email error:', err));
+        }
+
+        res.json({ message: 'If this email is registered, a reset link is on its way.' });
+    } catch (err) {
+        console.error('Forgot password error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// ── GET /api/auth/reset-password?token=xxx ───────────────────────────────────
+// Validate the token before showing the reset form
+router.get('/reset-password', async (req, res) => {
+    try {
+        const { token } = req.query;
+        if (!token) return res.status(400).json({ error: 'Token is required' });
+
+        const record = await findValidToken(token);
+        if (!record) {
+            return res.status(400).json({ error: 'This reset link is invalid or has expired.' });
+        }
+
+        res.json({ valid: true, email: record.email });
+    } catch (err) {
+        console.error('Validate reset token error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// ── POST /api/auth/reset-password ────────────────────────────────────────────
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        if (!token || !newPassword) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+        if (newPassword.length < 8) {
+            return res.status(400).json({ error: 'Password must be at least 8 characters' });
+        }
+
+        const record = await findValidToken(token);
+        if (!record) {
+            return res.status(400).json({ error: 'This reset link is invalid or has expired.' });
+        }
+
+        const passwordHash = await bcrypt.hash(newPassword, 10);
+        await updatePassword(record.user_id, passwordHash);
+        await markTokenUsed(token);
+
+        res.json({ message: 'Password updated successfully.' });
+    } catch (err) {
+        console.error('Reset password error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });

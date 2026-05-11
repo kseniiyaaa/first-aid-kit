@@ -122,4 +122,32 @@ const sendEmailChangeEmail = async ({ to, name, verifyUrl }) => {
     });
 };
 
-module.exports = { sendVerificationEmail, sendEmailChangeEmail };
+// ── Send password-reset email ────────────────────────────────────────────────
+const sendPasswordResetEmail = async ({ to, name, resetUrl }) => {
+    const body = `
+      <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:#212529;text-align:center">
+        Reset your password
+      </h1>
+      <p style="margin:0 0 4px;font-size:15px;color:#495057;line-height:1.65;text-align:center">
+        Hi <strong>${name}</strong>,
+      </p>
+      <p style="margin:0 0 4px;font-size:15px;color:#495057;line-height:1.65;text-align:center">
+        We received a request to reset your MediKit password.<br>
+        Click the button below to choose a new one.
+      </p>
+      ${actionButton(resetUrl, 'Reset Password')}
+      <p style="margin:0;font-size:13px;color:#9bb5bc;text-align:center">
+        This link expires in <strong>24 hours</strong>.<br>
+        If you didn't request a password reset, you can safely ignore this email.
+      </p>
+    `;
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_FROM || `"MediKit" <${process.env.EMAIL_USER}>`,
+        to,
+        subject: 'Reset your MediKit password',
+        html: emailLayout(body),
+    });
+};
+
+module.exports = { sendVerificationEmail, sendEmailChangeEmail, sendPasswordResetEmail };

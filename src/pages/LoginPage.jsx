@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthProvider.jsx';
 import '../styles/AuthPage.css';
@@ -8,9 +8,20 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [searchParams] = useSearchParams();
     const { login } = useAuth();
 
-    const [email, setEmail] = useState('');
+    const passwordWasReset = searchParams.get('passwordReset') === '1';
+
+    const [email, setEmail] = useState(location.state?.email ?? '');
+
+    // Belt-and-suspenders: also set via effect in case useState initializer
+    // runs before the location state is fully available (navigation timing)
+    useEffect(() => {
+        if (location.state?.email) setEmail(location.state.email);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});
@@ -75,6 +86,12 @@ export default function LoginPage() {
             <div className="auth-form-container">
                 <h2 className="auth-form-title">Welcome to MediKit</h2>
 
+                {passwordWasReset && (
+                    <div className="auth-reset-success">
+                        Password updated! You can now log in.
+                    </div>
+                )}
+
                 <div className="auth-input-field">
                     <input
                         className={`auth-input${errors.email ? ' auth-input--invalid' : ''}`}
@@ -126,7 +143,12 @@ export default function LoginPage() {
                 </div>
 
                 <div className="auth-link-row">
-                    <button className="auth-link-button">Forgot password?</button>
+                    <button
+                        className="auth-link-button"
+                        onClick={() => navigate('/forgot-password', { state: { email } })}
+                    >
+                        Forgot password?
+                    </button>
                 </div>
 
                 <div className="auth-input-field">
