@@ -17,7 +17,7 @@ export default function ItemCard({ data, isDone, onToggle }) {
 
     return (
         <div className={`${data.type}-item${isDone ? ' reminder-taken' : ''}`}>
-            {data.type === 'reminder' && (
+            {data.type === 'reminder' && !!onToggle && (
                 <button
                     className={`reminder-checkbox${isDone ? ' reminder-checkbox-checked' : ''}`}
                     role="checkbox"

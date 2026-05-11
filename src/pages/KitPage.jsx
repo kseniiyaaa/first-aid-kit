@@ -31,7 +31,7 @@ export default function KitPage() {
 
             <div className="kit-header-row">
                 <span className="kit-item-count">
-                    {isLoading ? '…' : `${medicines.length} item${medicines.length !== 1 ? 's' : ''}`} · Last updated today
+                    {isLoading ? '…' : `${medicines.length} item${medicines.length !== 1 ? 's' : ''}`}
                 </span>
                 <button className="kit-add-button" onClick={() => navigate('/add')}>
                     <Plus size={16} />

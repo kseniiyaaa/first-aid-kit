@@ -36,6 +36,12 @@
     color: #FB5D60;
 }
 
+.pill-form-optional {
+    font-size: 13px;
+    font-weight: 400;
+    color: #9bb5bc;
+}
+
 .pill-form-input {
     width: 90%;
     height: 52px;

@@ -7,6 +7,9 @@ import KitPage          from './pages/KitPage.jsx'
 import AccountPage      from './pages/AccountPage.jsx'
 import AddDecisionPage  from './pages/AddDecisionPage.jsx'
 import AddPillPage      from './pages/AddPillPage.jsx'
+import AddReminderPage  from './pages/AddReminderPage.jsx'
+import EditReminderPage from './pages/EditReminderPage.jsx'
+import RemindersPage    from './pages/RemindersPage.jsx'
 import PillPage         from './pages/PillPage.jsx'
 import VerifyEmailPage      from './pages/VerifyEmailPage.jsx'
 import ForgotPasswordPage   from './pages/ForgotPasswordPage.jsx'
@@ -29,8 +32,11 @@ function App() {
             <Route path="/kit"        element={<ProtectedRoute><KitPage /></ProtectedRoute>} />
             <Route path="/account"    element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
             <Route path="/add"        element={<ProtectedRoute><AddDecisionPage /></ProtectedRoute>} />
-            <Route path="/add/manual" element={<ProtectedRoute><AddPillPage /></ProtectedRoute>} />
-            <Route path="/pill/:id"   element={<ProtectedRoute><PillPage /></ProtectedRoute>} />
+            <Route path="/add/manual"   element={<ProtectedRoute><AddPillPage /></ProtectedRoute>} />
+            <Route path="/add/reminder"        element={<ProtectedRoute><AddReminderPage /></ProtectedRoute>} />
+            <Route path="/reminders"           element={<ProtectedRoute><RemindersPage /></ProtectedRoute>} />
+            <Route path="/reminders/:id/edit"  element={<ProtectedRoute><EditReminderPage /></ProtectedRoute>} />
+            <Route path="/pill/:id"            element={<ProtectedRoute><PillPage /></ProtectedRoute>} />
         </Routes>
     )
 }

@@ -5,9 +5,11 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const medicineRoutes = require('./routes/medicines');
+const reminderRoutes = require('./routes/reminders');
 const { createUsersTable } = require('./models/User');
 const { createMedicinesTable } = require('./models/Medicine');
 const { createPasswordResetTokensTable } = require('./models/PasswordResetToken');
+const { createRemindersTable } = require('./models/Reminder');
 
 const app = express();
 
@@ -17,10 +19,11 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/medicines', medicineRoutes);
+app.use('/api/reminders', reminderRoutes);
 
 const PORT = process.env.PORT || 3001;
 
-Promise.all([createUsersTable(), createMedicinesTable(), createPasswordResetTokensTable()])
+Promise.all([createUsersTable(), createMedicinesTable(), createPasswordResetTokensTable(), createRemindersTable()])
     .then(() => {
         app.listen(PORT, () => {
             console.log(`Server running on http://localhost:${PORT}`);
