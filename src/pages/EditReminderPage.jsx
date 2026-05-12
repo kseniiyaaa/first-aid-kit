@@ -34,12 +34,12 @@ export default function EditReminderPage() {
 
     const [medicines,          setMedicines]          = useState([]);
     const [selectedMedicineId, setSelectedMedicineId] = useState('');
-    const [customName,         setCustomName]         = useState('');
     const [date,               setDate]               = useState('');
     const [time,               setTime]               = useState('');
     const [endDate,            setEndDate]            = useState('');
     const [note,               setNote]               = useState('');
     const [recurrence,         setRecurrence]         = useState('none');
+    const [doseAmount,         setDoseAmount]         = useState('');
     const [errors,             setErrors]             = useState({});
     const [serverError,        setServerError]        = useState('');
     const [isLoading,          setIsLoading]          = useState(false);
@@ -66,27 +66,20 @@ export default function EditReminderPage() {
                 setEndDate(parseDateField(reminder.end_date));
                 setNote(reminder.note || '');
                 setRecurrence(reminder.recurrence || 'none');
+                setDoseAmount(reminder.dose_amount != null ? String(reminder.dose_amount) : '');
                 if (reminder.medicine_id) {
                     setSelectedMedicineId(String(reminder.medicine_id));
-                } else {
-                    setSelectedMedicineId('__custom__');
-                    setCustomName(reminder.medicine_name);
                 }
             })
             .catch(() => setNotFound(true));
     }, [id]);
 
-    const isCustom    = selectedMedicineId === '__custom__';
     const isRecurring = recurrence !== 'none';
     const selectedMedicine = medicines.find((m) => String(m.id) === selectedMedicineId);
 
     const validate = () => {
         const errs = {};
-        if (!selectedMedicineId) {
-            errs.medicine = 'Please select a medicine';
-        } else if (isCustom && !customName.trim()) {
-            errs.medicine = 'Please enter a medicine name';
-        }
+        if (!selectedMedicineId) errs.medicine = 'Please select a medicine';
         if (!date) errs.date = 'Please select a date';
         if (!time) errs.time = 'Please select a time';
         if (isRecurring && endDate && endDate < date) {
@@ -102,8 +95,8 @@ export default function EditReminderPage() {
         setIsLoading(true);
         setServerError('');
 
-        const medicine_name = isCustom ? customName.trim() : selectedMedicine.name;
-        const medicine_id   = isCustom ? null : Number(selectedMedicineId);
+        const medicine_name = selectedMedicine.name;
+        const medicine_id   = Number(selectedMedicineId);
         const remind_at     = `${date}T${time}:00`;
 
         try {
@@ -112,10 +105,11 @@ export default function EditReminderPage() {
                 body: JSON.stringify({
                     medicine_id,
                     medicine_name,
-                    note:     note.trim() || null,
+                    note:        note.trim() || null,
                     remind_at,
                     recurrence,
-                    end_date: isRecurring && endDate ? endDate : null,
+                    end_date:    isRecurring && endDate ? endDate : null,
+                    dose_amount: doseAmount !== '' ? doseAmount : null,
                 }),
             });
             const data = await res.json();
@@ -152,29 +146,46 @@ export default function EditReminderPage() {
                     <select
                         className={`pill-form-select${errors.medicine ? ' pill-form-input--invalid' : ''}`}
                         value={selectedMedicineId}
-                        onChange={(e) => { setSelectedMedicineId(e.target.value); setCustomName(''); }}
+                        onChange={(e) => { setSelectedMedicineId(e.target.value); setDoseAmount(''); }}
                         disabled={isLoading}
                     >
                         <option value="">— Select a medicine —</option>
                         {medicines.map((m) => (
                             <option key={m.id} value={String(m.id)}>{m.name}</option>
                         ))}
-                        <option value="__custom__">Other (enter name manually)</option>
                     </select>
-                    {isCustom && (
-                        <input
-                            className={`pill-form-input${errors.medicine ? ' pill-form-input--invalid' : ''}`}
-                            type="text"
-                            placeholder="Medicine name"
-                            value={customName}
-                            onChange={(e) => setCustomName(e.target.value)}
-                            disabled={isLoading}
-                        />
-                    )}
                     {errors.medicine && (
                         <span className="pill-form-field-error">{errors.medicine}</span>
                     )}
                 </div>
+
+                {/* Dose amount — лише якщо вибрана ліки */}
+                {selectedMedicine && (
+                    <div className="pill-form-field">
+                        <label className="pill-form-label">
+                            Dose amount <span className="pill-form-optional">(optional)</span>
+                        </label>
+                        {selectedMedicine.quantity == null ? (
+                            <p className="reminder-dose-hint">Quantity not tracked for this medicine</p>
+                        ) : (
+                            <div className="reminder-dose-row">
+                                <input
+                                    className="pill-form-input"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    placeholder="e.g. 1"
+                                    value={doseAmount}
+                                    onChange={(e) => setDoseAmount(e.target.value)}
+                                    disabled={isLoading}
+                                />
+                                {selectedMedicine.unit && (
+                                    <span className="reminder-dose-unit">{selectedMedicine.unit}</span>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Date & Time */}
                 <div className="pill-form-row">

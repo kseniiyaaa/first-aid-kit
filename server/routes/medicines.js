@@ -1,6 +1,6 @@
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
-const { getMedicinesByUserId, getMedicineById, createMedicine, updateMedicine } = require('../models/Medicine');
+const { getMedicinesByUserId, getMedicineById, createMedicine, updateMedicine, deleteMedicine } = require('../models/Medicine');
 
 const router = express.Router();
 
@@ -54,6 +54,18 @@ router.put('/:id', requireAuth, async (req, res) => {
         res.json(medicine);
     } catch (err) {
         console.error('Update medicine error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// DELETE /api/medicines/:id
+router.delete('/:id', requireAuth, async (req, res) => {
+    try {
+        const deleted = await deleteMedicine(req.params.id, req.userId);
+        if (!deleted) return res.status(404).json({ error: 'Medicine not found' });
+        res.json({ message: 'Medicine deleted' });
+    } catch (err) {
+        console.error('Delete medicine error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });

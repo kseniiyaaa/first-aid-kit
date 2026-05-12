@@ -142,6 +142,108 @@
 
 .kit-add-first-button:hover { filter: brightness(0.96); }
 
+/* Delete button on each row */
+.kit-delete-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #adb5bd;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.kit-delete-button:hover {
+    background: #fff0f0;
+    color: #FB5D60;
+}
+
+/* Confirm-delete modal */
+.kit-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 16px;
+}
+
+.kit-modal {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 28px 24px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.kit-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #212529;
+    margin: 0 0 12px;
+}
+
+.kit-modal-body {
+    font-size: 15px;
+    color: #495057;
+    line-height: 1.55;
+    margin: 0 0 16px;
+}
+
+.kit-modal-error {
+    font-size: 13px;
+    color: #FB5D60;
+    margin: 0 0 12px;
+}
+
+.kit-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.kit-modal-btn {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+
+.kit-modal-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.kit-modal-btn--cancel {
+    background: #E8F0F2;
+    color: #212529;
+}
+
+.kit-modal-btn--cancel:hover:not(:disabled) {
+    filter: brightness(0.96);
+}
+
+.kit-modal-btn--delete {
+    background: #FB5D60;
+    color: #fff;
+}
+
+.kit-modal-btn--delete:hover:not(:disabled) {
+    filter: brightness(0.92);
+}
+
 @media (max-width: 768px) {
     .kit-page-container {
         padding: 24px 16px;

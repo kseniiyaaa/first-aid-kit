@@ -74,9 +74,9 @@ router.put('/:id', requireAuth, async (req, res) => {
 // PATCH /api/reminders/:id/taken
 router.patch('/:id/taken', requireAuth, async (req, res) => {
     try {
-        const reminder = await toggleReminderTaken(req.params.id, req.userId);
-        if (!reminder) return res.status(404).json({ error: 'Reminder not found' });
-        res.json(reminder);
+        const result = await toggleReminderTaken(req.params.id, req.userId);
+        if (!result) return res.status(404).json({ error: 'Reminder not found' });
+        res.json(result); // { reminder, medicine }
     } catch (err) {
         console.error('Toggle reminder taken error:', err);
         res.status(500).json({ error: 'Server error' });

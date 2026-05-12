@@ -58,4 +58,12 @@ const updateMedicine = async (id, userId, data) => {
     return result.rows[0] || null;
 };
 
-module.exports = { createMedicinesTable, getMedicinesByUserId, getMedicineById, createMedicine, updateMedicine };
+const deleteMedicine = async (id, userId) => {
+    const result = await pool.query(
+        'DELETE FROM medicines WHERE id = $1 AND user_id = $2 RETURNING id',
+        [id, userId]
+    );
+    return result.rows[0] || null;
+};
+
+module.exports = { createMedicinesTable, getMedicinesByUserId, getMedicineById, createMedicine, updateMedicine, deleteMedicine };

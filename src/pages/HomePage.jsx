@@ -127,17 +127,26 @@ export default function HomePage() {
     }, []);
 
     const toggleReminder = useCallback(async (id, currentTakenToday) => {
+        // Оптимістичне оновлення
         setReminders((prev) =>
             prev.map((r) => (r.id === id ? { ...r, taken_today: !currentTakenToday } : r))
         );
         try {
             const res = await authFetch(`/api/reminders/${id}/taken`, { method: 'PATCH' });
             if (!res.ok) throw new Error();
-            const updated = await res.json();
+            const { reminder: updated, medicine } = await res.json();
+            // Оновлюємо стан нагадування
             setReminders((prev) =>
                 prev.map((r) => (r.id === id ? { ...r, taken_today: updated.taken_today } : r))
             );
+            // Оновлюємо залишок ліків якщо сервер повернув оновлений запас
+            if (medicine) {
+                setMedicines((prev) =>
+                    prev.map((m) => (m.id === medicine.id ? { ...m, quantity: medicine.quantity } : m))
+                );
+            }
         } catch {
+            // Відкат оптимістичного оновлення
             setReminders((prev) =>
                 prev.map((r) => (r.id === id ? { ...r, taken_today: currentTakenToday } : r))
             );

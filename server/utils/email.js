@@ -150,4 +150,40 @@ const sendPasswordResetEmail = async ({ to, name, resetUrl }) => {
     });
 };
 
-module.exports = { sendVerificationEmail, sendEmailChangeEmail, sendPasswordResetEmail };
+// ── Send medication reminder email ───────────────────────────────────────────
+const sendReminderEmail = async ({ to, name, medicineName, note, scheduledTime }) => {
+    const body = `
+      <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#212529;text-align:center">
+        💊 Time to take your medicine
+      </h1>
+      <p style="margin:0 0 6px;font-size:15px;color:#495057;line-height:1.65;text-align:center">
+        Hi <strong>${name}</strong>,
+      </p>
+      <p style="margin:0 0 24px;font-size:15px;color:#495057;line-height:1.65;text-align:center">
+        This is your reminder to take:
+      </p>
+
+      <!-- Medicine highlight box -->
+      <div style="background:#E8F0F2;border-radius:12px;padding:20px 24px;text-align:center;margin-bottom:24px">
+        <div style="font-size:20px;font-weight:700;color:#0D171C;margin-bottom:4px">
+          ${medicineName}
+        </div>
+        <div style="font-size:14px;color:#4F8796">Scheduled for ${scheduledTime}</div>
+        ${note ? `<div style="margin-top:10px;font-size:14px;color:#495057;font-style:italic">${note}</div>` : ''}
+      </div>
+
+      <p style="margin:0;font-size:13px;color:#9bb5bc;text-align:center">
+        Mark it as taken in your MediKit app once done.
+      </p>
+      ${actionButton((process.env.APP_URL || 'http://localhost:5173') + '/home', 'Open MediKit')}
+    `;
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_FROM || `"MediKit" <${process.env.EMAIL_USER}>`,
+        to,
+        subject: `MediKit Reminder: ${medicineName}`,
+        html: emailLayout(body),
+    });
+};
+
+module.exports = { sendVerificationEmail, sendEmailChangeEmail, sendPasswordResetEmail, sendReminderEmail };

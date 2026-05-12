@@ -178,6 +178,31 @@
 .pill-form-cancel-button:hover { filter: brightness(0.96); }
 .pill-form-cancel-button:disabled { opacity: 0.65; cursor: not-allowed; }
 
+/* Dose amount row */
+.reminder-dose-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reminder-dose-row .pill-form-input {
+    flex: 1;
+}
+
+.reminder-dose-unit {
+    font-size: 14px;
+    color: #4F8796;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.reminder-dose-hint {
+    margin: 0;
+    font-size: 13px;
+    color: #9bb5bc;
+    font-style: italic;
+}
+
 @media (max-width: 768px) {
     .add-pill-container { padding: 24px 16px; }
     .pill-form-row { grid-template-columns: 1fr; gap: 0; }
