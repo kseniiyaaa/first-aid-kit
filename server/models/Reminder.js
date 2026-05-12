@@ -17,7 +17,7 @@ const createRemindersTable = async () => {
             created_at    TIMESTAMP DEFAULT NOW()
         )
     `);
-    // Міграції для існуючих БД
+    // Migrations for existing databases
     await pool.query(`ALTER TABLE reminders ADD COLUMN IF NOT EXISTS end_date DATE`);
     await pool.query(`ALTER TABLE reminders ADD COLUMN IF NOT EXISTS last_email_sent TIMESTAMP`);
     await pool.query(`ALTER TABLE reminders ADD COLUMN IF NOT EXISTS dose_amount DECIMAL`);
@@ -58,7 +58,6 @@ const createReminder = async (userId, data) => {
 };
 
 const toggleReminderTaken = async (id, userId) => {
-    // Поточний стан + дані для deducting
     const check = await pool.query(
         `SELECT (is_taken AND taken_date = CURRENT_DATE) AS taken_today,
                 medicine_id, dose_amount
@@ -69,7 +68,6 @@ const toggleReminderTaken = async (id, userId) => {
 
     const { taken_today: takenToday, medicine_id, dose_amount } = check.rows[0];
 
-    // Оновлюємо стан нагадування
     let reminderResult;
     if (takenToday) {
         reminderResult = await pool.query(
@@ -88,10 +86,10 @@ const toggleReminderTaken = async (id, userId) => {
     }
     const reminder = reminderResult.rows[0];
 
-    // Коригуємо запас ліків, якщо є medicine_id і dose_amount
+    // Adjust medicine stock if medicine_id and dose_amount are set
     let medicine = null;
     if (medicine_id && dose_amount) {
-        // taken → відняти; un-taken → повернути
+        // taken → deduct; un-taken → restore
         const delta = takenToday ? Number(dose_amount) : -Number(dose_amount);
         const medResult = await pool.query(
             `UPDATE medicines
@@ -146,8 +144,8 @@ const deleteReminder = async (id, userId) => {
 };
 
 /**
- * Повертає нагадування, яким треба надіслати email прямо зараз.
- * currentTime — рядок "HH:MM" у LOCAL-часі сервера.
+ * Returns reminders that are due to receive an email right now.
+ * currentTime — "HH:MM" string in the server's local time.
  */
 const getDueReminders = async (currentTime) => {
     const result = await pool.query(

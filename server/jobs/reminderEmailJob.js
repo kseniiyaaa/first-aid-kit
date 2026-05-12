@@ -3,8 +3,8 @@ const { getDueReminders, markEmailSent } = require('../models/Reminder');
 const { sendReminderEmail } = require('../utils/email');
 
 /**
- * Перевіряє, чи сьогодні є заплановане спрацювання для recurring-нагадування.
- * Логіка відповідає getNextOccurrence на фронтенді.
+ * Checks whether a recurring reminder has a scheduled occurrence today.
+ * Logic mirrors getNextOccurrence on the frontend.
  */
 function isTodayScheduled(remindAt, recurrence) {
     if (recurrence === 'daily') return true;
@@ -51,7 +51,7 @@ async function processReminders(currentTime) {
     if (candidates.length === 0) return;
 
     for (const reminder of candidates) {
-        // Для recurring — додатково перевіряємо що сьогодні є спрацювання
+        // For recurring reminders — skip if today is not a scheduled occurrence
         if (reminder.recurrence !== 'none' && !isTodayScheduled(reminder.remind_at, reminder.recurrence)) {
             continue;
         }
@@ -73,7 +73,6 @@ async function processReminders(currentTime) {
 }
 
 function startReminderEmailJob() {
-    // Запускається щохвилини
     cron.schedule('* * * * *', () => {
         const now = new Date();
         const hh  = String(now.getHours()).padStart(2, '0');

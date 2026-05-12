@@ -13,21 +13,21 @@ const formatDate = (dateStr) => {
     return `${d}.${m}.${y}`;
 };
 
-/** Повертає рядок YYYY-MM-DD для поточного локального дня */
+/** Returns a YYYY-MM-DD string for the current local day */
 function localTodayStr() {
     const n = new Date();
     const pad = (x) => String(x).padStart(2, '0');
     return `${n.getFullYear()}-${pad(n.getMonth() + 1)}-${pad(n.getDate())}`;
 }
 
-/** Витягує рядок дати YYYY-MM-DD з будь-якого поля (ISO string чи Date) */
+/** Normalises any date value (ISO string or Date) to a YYYY-MM-DD string */
 function toDateStr(val) {
     if (!val) return '';
     const s = typeof val === 'string' ? val : new Date(val).toISOString();
     return s.slice(0, 10);
 }
 
-/** Посунути дату на одне повторення вперед */
+/** Advances a date by one recurrence step */
 function advanceByRecurrence(date, recurrence) {
     const d = new Date(date);
     if      (recurrence === 'daily')           d.setDate(d.getDate() + 1);
@@ -37,7 +37,7 @@ function advanceByRecurrence(date, recurrence) {
     return d;
 }
 
-/** Перше спрацювання ≥ початку сьогоднішнього дня */
+/** Returns the first occurrence >= the start of today */
 function getNextOccurrence(remindAt, recurrence) {
     const remind = new Date(remindAt);
     if (recurrence === 'none') return remind;
@@ -53,10 +53,10 @@ function getNextOccurrence(remindAt, recurrence) {
 }
 
 /**
- * Генерує спрацювання для головної сторінки:
- * - одноразові: показує якщо remind_at >= сьогодні
- * - повторювані: показує ЛИШЕ якщо СЬОГОДНІ є заплановане спрацювання
- *   (не майбутні дні), і лише якщо end_date ще не минув
+ * Generates occurrences for the home page:
+ * - one-time: shown if remind_at >= today
+ * - recurring: shown ONLY if there is a scheduled occurrence TODAY
+ *   (not future days), and only if end_date has not passed
  */
 function generateOccurrences(reminder) {
     const todayStr    = localTodayStr();
@@ -64,19 +64,17 @@ function generateOccurrences(reminder) {
     const tomorrowStart = new Date(todayStart); tomorrowStart.setDate(tomorrowStart.getDate() + 1);
 
     if (reminder.recurrence === 'none') {
-        // Одноразове: показуємо якщо дата ще не минула
         const remindDateStr = toDateStr(reminder.remind_at);
         if (remindDateStr < todayStr) return [];
         return [{ ...reminder, occurrenceDate: new Date(reminder.remind_at) }];
     }
 
-    // Перевірка end_date: якщо він є і вже минув — не показувати
     if (reminder.end_date) {
         const endStr = toDateStr(reminder.end_date);
         if (endStr < todayStr) return [];
     }
 
-    // Повторюване: показуємо лише якщо СЬОГОДНІ є спрацювання
+    // Recurring: show only if there is a scheduled occurrence today
     const nextOcc = getNextOccurrence(reminder.remind_at, reminder.recurrence);
     if (nextOcc >= todayStart && nextOcc < tomorrowStart) {
         return [{ ...reminder, occurrenceDate: nextOcc }];
@@ -88,10 +86,10 @@ function formatReminderTime(date) {
     const now = new Date();
     const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
-    const timeStr = date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
+    const timeStr = date.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
         minute: '2-digit',
-        hour12: true,
+        hour12: false,
     });
 
     if (date.toDateString() === now.toDateString())       return `Today, ${timeStr}`;
@@ -127,7 +125,7 @@ export default function HomePage() {
     }, []);
 
     const toggleReminder = useCallback(async (id, currentTakenToday) => {
-        // Оптимістичне оновлення
+        // Optimistic update
         setReminders((prev) =>
             prev.map((r) => (r.id === id ? { ...r, taken_today: !currentTakenToday } : r))
         );
@@ -135,18 +133,16 @@ export default function HomePage() {
             const res = await authFetch(`/api/reminders/${id}/taken`, { method: 'PATCH' });
             if (!res.ok) throw new Error();
             const { reminder: updated, medicine } = await res.json();
-            // Оновлюємо стан нагадування
             setReminders((prev) =>
                 prev.map((r) => (r.id === id ? { ...r, taken_today: updated.taken_today } : r))
             );
-            // Оновлюємо залишок ліків якщо сервер повернув оновлений запас
             if (medicine) {
                 setMedicines((prev) =>
                     prev.map((m) => (m.id === medicine.id ? { ...m, quantity: medicine.quantity } : m))
                 );
             }
         } catch {
-            // Відкат оптимістичного оновлення
+            // Revert optimistic update
             setReminders((prev) =>
                 prev.map((r) => (r.id === id ? { ...r, taken_today: currentTakenToday } : r))
             );
@@ -177,14 +173,14 @@ export default function HomePage() {
             dateOrTime: formatDate(m.expiration_date),
         }));
 
-    // Кількість активних (не архівних) нагадувань для Kit Summary
+    // Active (non-archived) reminder count for Kit Summary
     const activeReminderCount = reminders.filter((r) => {
         if (r.recurrence === 'none') return toDateStr(r.remind_at) >= todayStr;
         if (r.end_date)              return toDateStr(r.end_date)  >= todayStr;
         return true; // повторюване без end_date — завжди активне
     }).length;
 
-    // Сьогоднішні спрацювання (max 5)
+    // Today's occurrences (max 5)
     const upcomingOccurrences = reminders
         .flatMap((r) => generateOccurrences(r))
         .sort((a, b) => a.occurrenceDate - b.occurrenceDate)

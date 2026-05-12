@@ -12,21 +12,21 @@ const RECURRENCE_LABELS = {
     monthly:         'Every month',
 };
 
-/** Повертає рядок YYYY-MM-DD для поточного локального дня */
+/** Returns a YYYY-MM-DD string for the current local day */
 function localTodayStr() {
     const n = new Date();
     const pad = (x) => String(x).padStart(2, '0');
     return `${n.getFullYear()}-${pad(n.getMonth() + 1)}-${pad(n.getDate())}`;
 }
 
-/** Витягує рядок дати YYYY-MM-DD з будь-якого поля */
+/** Normalises any date value to a YYYY-MM-DD string */
 function toDateStr(val) {
     if (!val) return '';
     const s = typeof val === 'string' ? val : new Date(val).toISOString();
     return s.slice(0, 10);
 }
 
-/** Форматує дату як DD.MM.YYYY */
+/** Formats a date as DD.MM.YYYY */
 function toDMY(val) {
     const s = toDateStr(val);
     if (!s) return '';
@@ -34,16 +34,16 @@ function toDMY(val) {
     return `${d}.${m}.${y}`;
 }
 
-/** Форматує час із remind_at */
+/** Formats the time portion of a remind_at value */
 function timeOf(remindAt) {
-    return new Date(remindAt).toLocaleTimeString('en-US', {
-        hour: 'numeric',
+    return new Date(remindAt).toLocaleTimeString('en-GB', {
+        hour: '2-digit',
         minute: '2-digit',
-        hour12: true,
+        hour12: false,
     });
 }
 
-/** Рядок метаданих для рядка нагадування */
+/** Builds the metadata string displayed on a reminder row */
 function reminderMeta(r, isArchive) {
     const time  = timeOf(r.remind_at);
     const label = RECURRENCE_LABELS[r.recurrence] ?? r.recurrence;
@@ -52,12 +52,12 @@ function reminderMeta(r, isArchive) {
         return `${toDMY(r.remind_at)} · ${time}`;
     }
 
-    // Для архівних recurring — показуємо діапазон дат
+    // Archived recurring — show full date range
     if (isArchive && r.end_date) {
         return `${label} · ${time} · ${toDMY(r.remind_at)} – ${toDMY(r.end_date)}`;
     }
 
-    // Активне recurring — лише мітка і час
+    // Active recurring — label and time only
     const endStr = r.end_date ? `  (until ${toDMY(r.end_date)})` : '';
     return `${label} · ${time}${endStr}`;
 }
@@ -80,9 +80,9 @@ export default function RemindersPage() {
     const todayStr = localTodayStr();
 
     /**
-     * Нагадування вважається архівним якщо:
-     * - одноразове і remind_at < сьогодні
-     * - повторюване і end_date встановлено і end_date < сьогодні
+     * A reminder is considered archived if:
+     * - one-time and remind_at < today
+     * - recurring and end_date is set and end_date < today
      */
     const isArchived = (r) => {
         if (r.recurrence === 'none') return toDateStr(r.remind_at) < todayStr;

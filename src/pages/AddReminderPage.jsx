@@ -107,7 +107,7 @@ export default function AddReminderPage() {
                     {errors.medicine && <span className="pill-form-field-error">{errors.medicine}</span>}
                 </div>
 
-                {/* Dose amount — лише якщо вибрана ліки */}
+                {/* Dose amount — shown only when a medicine is selected */}
                 {selectedMedicine && (
                     <div className="pill-form-field">
                         <label className="pill-form-label">
@@ -184,7 +184,7 @@ export default function AddReminderPage() {
                     </select>
                 </div>
 
-                {/* End date — лише для recurring */}
+                {/* End date — recurring reminders only */}
                 {isRecurring && (
                     <div className="pill-form-field">
                         <label className="pill-form-label">

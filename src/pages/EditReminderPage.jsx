@@ -11,7 +11,7 @@ const RECURRENCE_OPTIONS = [
     { value: 'monthly',         label: 'Every month' },
 ];
 
-/** Витягує локальну дату/час із рядка TIMESTAMP, що повертає pg */
+/** Extracts local date and time from a TIMESTAMP string returned by pg */
 function parseRemindAt(remindAt) {
     const d = new Date(remindAt);
     const pad = (n) => String(n).padStart(2, '0');
@@ -21,7 +21,7 @@ function parseRemindAt(remindAt) {
     };
 }
 
-/** Витягує рядок YYYY-MM-DD із DATE-поля (pg повертає як UTC ISO) */
+/** Extracts a YYYY-MM-DD string from a DATE field (pg returns it as a UTC ISO string) */
 function parseDateField(val) {
     if (!val) return '';
     if (typeof val === 'string') return val.slice(0, 10);
@@ -159,7 +159,7 @@ export default function EditReminderPage() {
                     )}
                 </div>
 
-                {/* Dose amount — лише якщо вибрана ліки */}
+                {/* Dose amount — shown only when a medicine is selected */}
                 {selectedMedicine && (
                     <div className="pill-form-field">
                         <label className="pill-form-label">
@@ -240,7 +240,7 @@ export default function EditReminderPage() {
                     </select>
                 </div>
 
-                {/* End date — лише для recurring */}
+                {/* End date — recurring reminders only */}
                 {isRecurring && (
                     <div className="pill-form-field">
                         <label className="pill-form-label">
