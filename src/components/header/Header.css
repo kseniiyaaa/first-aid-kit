@@ -1,19 +1,18 @@
 /* Header Styles */
 .header {
-    position: fixed;   /* фиксируем блок */
-    top: 0;            /* прижимаем к верху */
-    left: 0;           /* прижимаем к левому краю */
-    right: 0;          /* прижимаем к правому краю */
-    z-index: 1000;     /* поверх другого контента */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
     border-bottom: 1px solid #eee;
-    background: #fff;  /* на случай прозрачности фона */
+    background: #fff;
 }
-
 
 .logo {
     display: flex;
@@ -21,13 +20,104 @@
     font-weight: bold;
     font-size: 20px;
     cursor: default;
+    flex-shrink: 0;
 }
 
 .logo-image {
     margin-right: 10px;
 }
 
-/* Auth buttons for welcome page */
+/* ── Right-side container ──────────────────────────────────────── */
+.header-right {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* ── Sliding search bar ────────────────────────────────────────── */
+.header-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    background: #E8F0F2;
+    border-radius: 24px;
+    padding: 0;
+    transition: width 0.3s ease, opacity 0.25s ease, padding 0.3s ease;
+}
+
+.header-search-bar--open {
+    /* Grows to fill available header space, leaving room for the logo */
+    width: min(480px, calc(100vw - 200px));
+    opacity: 1;
+    pointer-events: all;
+    padding: 8px 14px;
+}
+
+.header-search-bar-icon {
+    color: #4F8796;
+    flex-shrink: 0;
+}
+
+.header-search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    font-family: inherit;
+    color: #212529;
+    outline: none;
+    min-width: 0;
+}
+
+.header-search-input::placeholder {
+    color: #9bb5bc;
+}
+
+.header-search-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4F8796;
+    padding: 2px;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.header-search-close:hover {
+    color: #212529;
+}
+
+/* ── Icon row ──────────────────────────────────────────────────── */
+.header-icons {
+    display: flex;
+    gap: 25px;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.header-icons--hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(8px);
+}
+
+.header-icons .icon {
+    color: #000000;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.header-icons .icon:hover {
+    color: #495057;
+}
+
+/* ── Auth buttons ──────────────────────────────────────────────── */
 .auth-buttons button {
     margin-left: 12px;
     padding: 8px 16px;
@@ -58,28 +148,17 @@
     box-shadow: 0 4px 12px rgba(232, 240, 242, 0.3);
 }
 
-/* Header icons for logged in users */
-.header-icons {
-    display: flex;
-    gap: 25px;
-}
-
-.header-icons .icon {
-    color: #000000;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.header-icons .icon:hover {
-    color: #495057;
-}
-
+/* ── Responsive ────────────────────────────────────────────────── */
 @media (max-width: 768px) {
     .header {
-        padding: 10px;
+        padding: 10px 16px;
     }
 
     .header-icons {
         gap: 15px;
+    }
+
+    .header-search-bar--open {
+        width: calc(100vw - 130px);
     }
 }

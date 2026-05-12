@@ -8,9 +8,10 @@ import AccountPage      from './pages/AccountPage.jsx'
 import AddDecisionPage  from './pages/AddDecisionPage.jsx'
 import AddPillPage      from './pages/AddPillPage.jsx'
 import AddReminderPage  from './pages/AddReminderPage.jsx'
-import EditReminderPage from './pages/EditReminderPage.jsx'
-import RemindersPage    from './pages/RemindersPage.jsx'
-import PillPage         from './pages/PillPage.jsx'
+import EditReminderPage    from './pages/EditReminderPage.jsx'
+import RemindersPage       from './pages/RemindersPage.jsx'
+import PillPage            from './pages/PillPage.jsx'
+import SearchResultsPage   from './pages/SearchResultsPage.jsx'
 import VerifyEmailPage      from './pages/VerifyEmailPage.jsx'
 import ForgotPasswordPage   from './pages/ForgotPasswordPage.jsx'
 import ResetPasswordPage    from './pages/ResetPasswordPage.jsx'
@@ -37,6 +38,7 @@ function App() {
             <Route path="/reminders"           element={<ProtectedRoute><RemindersPage /></ProtectedRoute>} />
             <Route path="/reminders/:id/edit"  element={<ProtectedRoute><EditReminderPage /></ProtectedRoute>} />
             <Route path="/pill/:id"            element={<ProtectedRoute><PillPage /></ProtectedRoute>} />
+            <Route path="/search"             element={<ProtectedRoute><SearchResultsPage /></ProtectedRoute>} />
         </Routes>
     )
 }

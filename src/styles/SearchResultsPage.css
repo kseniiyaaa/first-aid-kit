@@ -1,0 +1,104 @@
+/* Search Results Page */
+.search-page-container {
+    max-width: 800px;
+    margin: 50px auto 0;
+    padding: 32px 24px;
+}
+
+.search-page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 8px;
+}
+
+.search-page-query {
+    color: #30BDE8;
+}
+
+.search-page-count {
+    font-size: 14px;
+    color: #4F8796;
+    margin-bottom: 20px;
+}
+
+.search-page-empty {
+    font-size: 15px;
+    color: #4F8796;
+    margin-top: 32px;
+}
+
+/* Results list — same style as KitPage */
+.search-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+}
+
+.search-result-item:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.search-result-icon {
+    width: 40px;
+    height: 40px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.search-result-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-result-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 4px;
+}
+
+.search-result-meta {
+    font-size: 14px;
+    color: #4F8796;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Highlight matched text */
+.search-highlight {
+    background: #fff0b3;
+    color: #212529;
+    border-radius: 2px;
+    padding: 0 1px;
+    font-style: normal;
+}
+
+@media (max-width: 768px) {
+    .search-page-container {
+        padding: 24px 16px;
+    }
+
+    .search-result-item {
+        padding: 12px;
+        gap: 12px;
+    }
+}
