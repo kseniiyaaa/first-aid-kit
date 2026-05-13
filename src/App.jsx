@@ -12,6 +12,7 @@ import EditReminderPage    from './pages/EditReminderPage.jsx'
 import RemindersPage       from './pages/RemindersPage.jsx'
 import PillPage            from './pages/PillPage.jsx'
 import SearchResultsPage   from './pages/SearchResultsPage.jsx'
+import LogIntakePage       from './pages/LogIntakePage.jsx'
 import VerifyEmailPage      from './pages/VerifyEmailPage.jsx'
 import ForgotPasswordPage   from './pages/ForgotPasswordPage.jsx'
 import ResetPasswordPage    from './pages/ResetPasswordPage.jsx'
@@ -39,6 +40,7 @@ function App() {
             <Route path="/reminders/:id/edit"  element={<ProtectedRoute><EditReminderPage /></ProtectedRoute>} />
             <Route path="/pill/:id"            element={<ProtectedRoute><PillPage /></ProtectedRoute>} />
             <Route path="/search"             element={<ProtectedRoute><SearchResultsPage /></ProtectedRoute>} />
+            <Route path="/log-intake"         element={<ProtectedRoute><LogIntakePage /></ProtectedRoute>} />
         </Routes>
     )
 }

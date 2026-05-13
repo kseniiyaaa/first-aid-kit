@@ -58,6 +58,17 @@ const updateMedicine = async (id, userId, data) => {
     return result.rows[0] || null;
 };
 
+const deductMedicineStock = async (id, userId, amount) => {
+    const result = await pool.query(
+        `UPDATE medicines
+         SET quantity = GREATEST(0, quantity - $1), updated_at = NOW()
+         WHERE id = $2 AND user_id = $3 AND quantity IS NOT NULL
+         RETURNING id, name, quantity, unit`,
+        [Number(amount), id, userId]
+    );
+    return result.rows[0] || null;
+};
+
 const deleteMedicine = async (id, userId) => {
     const result = await pool.query(
         'DELETE FROM medicines WHERE id = $1 AND user_id = $2 RETURNING id',
@@ -66,4 +77,4 @@ const deleteMedicine = async (id, userId) => {
     return result.rows[0] || null;
 };
 
-module.exports = { createMedicinesTable, getMedicinesByUserId, getMedicineById, createMedicine, updateMedicine, deleteMedicine };
+module.exports = { createMedicinesTable, getMedicinesByUserId, getMedicineById, createMedicine, updateMedicine, deductMedicineStock, deleteMedicine };

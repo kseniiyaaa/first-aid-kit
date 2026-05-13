@@ -1,6 +1,13 @@
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
-const { getMedicinesByUserId, getMedicineById, createMedicine, updateMedicine, deleteMedicine } = require('../models/Medicine');
+const {
+    getMedicinesByUserId,
+    getMedicineById,
+    createMedicine,
+    updateMedicine,
+    deductMedicineStock,
+    deleteMedicine,
+} = require('../models/Medicine');
 
 const router = express.Router();
 
@@ -11,6 +18,28 @@ router.get('/', requireAuth, async (req, res) => {
         res.json(medicines);
     } catch (err) {
         console.error('Get medicines error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// POST /api/medicines/intake  — must be before /:id to avoid param capture
+router.post('/intake', requireAuth, async (req, res) => {
+    try {
+        const { items } = req.body; // [{ medicine_id, amount }]
+        if (!Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ error: 'No items provided' });
+        }
+
+        const results = [];
+        for (const { medicine_id, amount } of items) {
+            if (!medicine_id || !amount || Number(amount) <= 0) continue;
+            const updated = await deductMedicineStock(medicine_id, req.userId, amount);
+            if (updated) results.push(updated);
+        }
+
+        res.json(results);
+    } catch (err) {
+        console.error('Log intake error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });

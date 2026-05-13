@@ -208,6 +208,12 @@ export default function HomePage() {
                         >
                             Set Reminder
                         </button>
+                        <button
+                            className="btn btn-accent btn-rounded"
+                            onClick={() => navigate('/log-intake')}
+                        >
+                            Log Intake
+                        </button>
                     </div>
                 </section>
 

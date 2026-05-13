@@ -51,8 +51,8 @@
 }
 
 .btn-primary {
-    background-color: #7dd3fc;
-    color: #0c4a6e;
+    background-color: #30BDE8;
+    color: #0D171C;
 }
 
 .btn-primary:hover {
@@ -60,12 +60,22 @@
 }
 
 .btn-secondary {
-    background-color: #e9ecef;
-    color: #495057;
+    background-color: #7dd3fc;
+    color: #0c4a6e;
 }
 
 .btn-secondary:hover {
     background-color: #dee2e6;
+}
+
+.btn-accent {
+    background-color: #e9ecef;
+    color: #495057;
+    font-weight: 600;
+}
+
+.btn-accent:hover {
+    background-color: #22aed8;
 }
 
 .btn-view-kit {
