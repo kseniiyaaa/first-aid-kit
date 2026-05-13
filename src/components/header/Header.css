@@ -152,13 +152,24 @@
 @media (max-width: 768px) {
     .header {
         padding: 10px 16px;
+        gap: 10px;
     }
 
     .header-icons {
         gap: 15px;
     }
 
+    /* Pull hidden icons out of the flow so the search bar can use their space */
+    .header-icons--hidden {
+        position: absolute;
+        right: 0;
+    }
+
     .header-search-bar--open {
-        width: calc(100vw - 130px);
+        width: calc(100vw - 160px);
+    }
+
+    .header-search-input {
+        font-size: 14px;
     }
 }
