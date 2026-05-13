@@ -32,19 +32,22 @@ export default function ItemCard({ data, isDone, onToggle }) {
             <div className={`${data.type}-icon`}>{renderIcon()}</div>
 
             <div className={`${data.type}-details`}>
-                <div className={`${data.type}-name`}>{data.name}</div>
-                {data.subtitle && (
-                    <div
-                        className={
-                            data.type === 'reminder'
-                                ? 'reminder-instruction'
-                                : data.type === 'stock'
-                                    ? 'stock-quantity'
-                                    : ''
-                        }
-                    >
-                        {data.subtitle}
+                {data.type === 'stock' ? (
+                    <div className="stock-wrapper">
+                        <div className="stock-name">{data.name}</div>
+                        {data.subtitle && (
+                            <div className="stock-quantity">{data.subtitle}</div>
+                        )}
                     </div>
+                ) : (
+                    <>
+                        <div className={`${data.type}-name`}>{data.name}</div>
+                        {data.subtitle && (
+                            <div className={data.type === 'reminder' ? 'reminder-instruction' : ''}>
+                                {data.subtitle}
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 

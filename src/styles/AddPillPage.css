@@ -178,6 +178,73 @@
 .pill-form-cancel-button:hover { filter: brightness(0.96); }
 .pill-form-cancel-button:disabled { opacity: 0.65; cursor: not-allowed; }
 
+/* Photo upload */
+.pill-photo-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #E8F0F2;
+    border: 2px dashed #B0D9E8;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #4F8796;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.pill-photo-upload-btn:hover:not(:disabled) {
+    background: #d4e9f0;
+    border-color: #30BDE8;
+    color: #212529;
+}
+
+.pill-photo-upload-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pill-photo-preview-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.pill-photo-preview {
+    display: block;
+    max-width: 220px;
+    max-height: 160px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pill-photo-remove {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6c757d;
+    transition: background 0.15s, color 0.15s;
+    padding: 0;
+}
+
+.pill-photo-remove:hover {
+    background: #fff0f0;
+    color: #FB5D60;
+}
+
 /* Dose amount row */
 .reminder-dose-row {
     display: flex;

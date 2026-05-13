@@ -12,10 +12,13 @@ const createMedicinesTable = async () => {
             unit             VARCHAR(50),
             expiration_date  DATE,
             instructions     TEXT,
+            photo            TEXT,
             created_at       TIMESTAMP DEFAULT NOW(),
             updated_at       TIMESTAMP DEFAULT NOW()
         )
     `);
+    // Migration for existing databases
+    await pool.query(`ALTER TABLE medicines ADD COLUMN IF NOT EXISTS photo TEXT`);
 };
 
 const getMedicinesByUserId = async (userId) => {
@@ -35,25 +38,25 @@ const getMedicineById = async (id, userId) => {
 };
 
 const createMedicine = async (userId, data) => {
-    const { name, purpose, dosage, quantity, unit, expiration_date, instructions } = data;
+    const { name, purpose, dosage, quantity, unit, expiration_date, instructions, photo } = data;
     const result = await pool.query(
-        `INSERT INTO medicines (user_id, name, purpose, dosage, quantity, unit, expiration_date, instructions)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `INSERT INTO medicines (user_id, name, purpose, dosage, quantity, unit, expiration_date, instructions, photo)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          RETURNING *`,
-        [userId, name, purpose || null, dosage || null, quantity || null, unit || null, expiration_date || null, instructions || null]
+        [userId, name, purpose || null, dosage || null, quantity || null, unit || null, expiration_date || null, instructions || null, photo || null]
     );
     return result.rows[0];
 };
 
 const updateMedicine = async (id, userId, data) => {
-    const { name, purpose, dosage, quantity, unit, expiration_date, instructions } = data;
+    const { name, purpose, dosage, quantity, unit, expiration_date, instructions, photo } = data;
     const result = await pool.query(
         `UPDATE medicines
          SET name = $1, purpose = $2, dosage = $3, quantity = $4, unit = $5,
-             expiration_date = $6, instructions = $7, updated_at = NOW()
-         WHERE id = $8 AND user_id = $9
+             expiration_date = $6, instructions = $7, photo = $8, updated_at = NOW()
+         WHERE id = $9 AND user_id = $10
          RETURNING *`,
-        [name, purpose || null, dosage || null, quantity || null, unit || null, expiration_date || null, instructions || null, id, userId]
+        [name, purpose || null, dosage || null, quantity || null, unit || null, expiration_date || null, instructions || null, photo ?? null, id, userId]
     );
     return result.rows[0] || null;
 };

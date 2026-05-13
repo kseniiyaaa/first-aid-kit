@@ -39,6 +39,7 @@ export default function AddDecisionPage() {
 
     return (
         <div className="add-decision-container">
+            <button className="back-btn" onClick={() => navigate('/home')}>← Home</button>
             <h1 className="add-decision-title">Add to Your Kit</h1>
 
             <div className="add-decision-search-row">

@@ -1,3 +1,21 @@
 * {
     font-family: Lexend, sans-serif;
 }
+
+/* Shared back-navigation button used across pages */
+.back-btn {
+    display: inline-block;
+    background: #E8F0F2;
+    color: #212529;
+    border: none;
+    border-radius: 16px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: filter 0.15s;
+    margin-bottom: 8px;
+}
+
+.back-btn:hover { filter: brightness(0.96); }

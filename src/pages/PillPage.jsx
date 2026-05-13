@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ImagePlus, X } from 'lucide-react';
 import { authFetch } from '../utils/api.js';
 import '../styles/PillPage.css';
 
@@ -21,6 +22,32 @@ const dataToForm = (m) => ({
     instructions:    m.instructions || '',
 });
 
+/** Resizes an image File to at most maxPx on its longest side, returns a base64 JPEG string */
+function resizeImage(file, maxPx = 900) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onerror = reject;
+            img.onload = () => {
+                let { width, height } = img;
+                if (width > maxPx || height > maxPx) {
+                    if (width >= height) { height = Math.round(height * maxPx / width); width = maxPx; }
+                    else                 { width = Math.round(width * maxPx / height);  height = maxPx; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width  = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.82));
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
 function DetailRow({ label, value }) {
     return (
         <div className="pill-detail-row">
@@ -33,13 +60,16 @@ function DetailRow({ label, value }) {
 export default function PillPage() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const fileInputRef = useRef(null);
 
-    const [medicine, setMedicine] = useState(null);
-    const [form, setForm] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
-    const [errors, setErrors] = useState({});
+    const [medicine,    setMedicine]    = useState(null);
+    const [form,        setForm]        = useState(null);
+    const [photo,       setPhoto]       = useState(null); // base64 or null (edit state)
+    const [photoError,  setPhotoError]  = useState('');
+    const [isEditing,   setIsEditing]   = useState(false);
+    const [isLoading,   setIsLoading]   = useState(true);
+    const [isSaving,    setIsSaving]    = useState(false);
+    const [errors,      setErrors]      = useState({});
     const [serverError, setServerError] = useState('');
     const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -60,6 +90,20 @@ export default function PillPage() {
 
     const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
+    const handlePhotoChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { setPhotoError('Please select an image file'); return; }
+        if (file.size > 10 * 1024 * 1024)    { setPhotoError('Image must be smaller than 10 MB'); return; }
+        setPhotoError('');
+        try {
+            setPhoto(await resizeImage(file));
+        } catch {
+            setPhotoError('Failed to process image. Please try another file.');
+        }
+        e.target.value = '';
+    };
+
     const validate = () => {
         const errs = {};
         if (!form.name.trim()) errs.name = 'Medicine name is required';
@@ -71,14 +115,17 @@ export default function PillPage() {
 
     const handleEdit = () => {
         setForm(dataToForm(medicine));
+        setPhoto(medicine.photo || null);
         setErrors({});
         setServerError('');
+        setPhotoError('');
         setSaveSuccess(false);
         setIsEditing(true);
     };
 
     const handleCancel = () => {
         setForm(dataToForm(medicine));
+        setPhoto(null);
         setErrors({});
         setServerError('');
         setIsEditing(false);
@@ -99,12 +146,14 @@ export default function PillPage() {
                     ...form,
                     quantity:        form.quantity !== '' ? Number(form.quantity) : null,
                     expiration_date: form.expiration_date || null,
+                    photo:           photo ?? null,
                 }),
             });
             const data = await res.json();
             if (!res.ok) { setServerError(data.error || 'Failed to save changes'); return; }
             setMedicine(data);
             setForm(dataToForm(data));
+            setPhoto(null);
             setIsEditing(false);
             setSaveSuccess(true);
             setTimeout(() => setSaveSuccess(false), 3000);
@@ -122,11 +171,64 @@ export default function PillPage() {
         ? `${medicine.quantity} ${medicine.unit || ''}`.trim()
         : null;
 
+    // In edit mode: `photo` state holds the new value (may equal medicine.photo or be changed/null)
+    const editPhoto = isEditing ? photo : medicine.photo;
+
     return (
         <div className="pill-page-container">
             <div className="pill-back-row">
                 <button className="pill-back-button" onClick={() => navigate('/kit')}>← Kit</button>
             </div>
+
+            {/* Photo */}
+            {(editPhoto || isEditing) && (
+                <div className="pill-page-photo-section">
+                    {editPhoto ? (
+                        <div className="pill-photo-preview-wrapper">
+                            <img src={editPhoto} alt={medicine.name} className="pill-page-photo" />
+                            {isEditing && (
+                                <>
+                                    <button
+                                        type="button"
+                                        className="pill-photo-remove"
+                                        onClick={() => setPhoto(null)}
+                                        aria-label="Remove photo"
+                                    >
+                                        <X size={15} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="pill-photo-change-btn"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        disabled={isSaving}
+                                    >
+                                        Change photo
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    ) : isEditing ? (
+                        <button
+                            type="button"
+                            className="pill-photo-upload-btn"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isSaving}
+                        >
+                            <ImagePlus size={18} />
+                            Add photo
+                        </button>
+                    ) : null}
+
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handlePhotoChange}
+                    />
+                    {photoError && <span className="pill-form-field-error">{photoError}</span>}
+                </div>
+            )}
 
             {/* Title */}
             {isEditing ? (

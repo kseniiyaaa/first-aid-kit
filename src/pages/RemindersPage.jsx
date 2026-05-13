@@ -112,6 +112,7 @@ export default function RemindersPage() {
 
     return (
         <div className="reminders-page">
+            <button className="back-btn" onClick={() => navigate('/home')}>← Home</button>
             <h1 className="reminders-title">Reminders</h1>
 
             {/* ── Tabs ── */}

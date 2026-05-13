@@ -56,6 +56,7 @@ export default function SearchResultsPage() {
 
     return (
         <div className="search-page-container">
+            <button className="back-btn" onClick={() => navigate('/home')}>← Home</button>
             <h1 className="search-page-title">
                 Search results{query ? <> for <span className="search-page-query">"{query}"</span></> : ''}
             </h1>

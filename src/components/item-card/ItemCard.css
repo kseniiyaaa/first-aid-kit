@@ -151,18 +151,27 @@
 
 .stock-details {
     flex: 1;
+    min-width: 0;
+}
+
+.stock-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
 }
 
 .stock-name {
     font-size: 16px;
     font-weight: 600;
     color: #212529;
-    margin-bottom: 4px;
 }
 
 .stock-quantity {
     font-size: 14px;
     color: teal;
+    white-space: nowrap;
 }
 
 .reorder-btn {

@@ -56,6 +56,7 @@ export default function KitPage() {
 
     return (
         <div className="kit-page-container">
+            <button className="back-btn" onClick={() => navigate('/home')}>← Home</button>
             <h1 className="kit-page-title">First Aid Kit</h1>
 
             <div className="kit-header-row">

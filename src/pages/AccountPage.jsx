@@ -186,6 +186,7 @@ export default function AccountPage() {
 
     return (
         <div className="account-page-container">
+            <button className="back-btn" onClick={() => navigate('/home')}>← Home</button>
             <h1 className="account-page-title">Account Settings</h1>
 
             {/* Profile header */}
