@@ -12,6 +12,17 @@
     margin-bottom: 28px;
 }
 
+/* Prefill notice (shown when form was pre-filled from drug database) */
+.pill-prefill-notice {
+    padding: 10px 14px;
+    background-color: rgba(48, 189, 232, 0.1);
+    border-left: 3px solid #30BDE8;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #0d6d8a;
+    margin-bottom: 16px;
+}
+
 /* Form */
 .pill-form {
     display: flex;

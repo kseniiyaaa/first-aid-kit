@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ImagePlus, X } from 'lucide-react';
 import { authFetch } from '../utils/api.js';
@@ -46,11 +46,32 @@ export default function AddPillPage() {
         expiration_date: '',
         instructions:    '',
     });
-    const [photo,       setPhoto]       = useState(null); // base64 data URL
-    const [photoError,  setPhotoError]  = useState('');
-    const [errors,      setErrors]      = useState({});
-    const [serverError, setServerError] = useState('');
-    const [isLoading,   setIsLoading]   = useState(false);
+    const [photo,        setPhoto]        = useState(null); // base64 data URL
+    const [photoError,   setPhotoError]   = useState('');
+    const [errors,       setErrors]       = useState({});
+    const [serverError,  setServerError]  = useState('');
+    const [isLoading,    setIsLoading]    = useState(false);
+    const [isPrefilled,  setIsPrefilled]  = useState(false);
+
+    // On mount: if navigated from drug search with ?prefill=1, read sessionStorage
+    useEffect(() => {
+        if (searchParams.get('prefill') !== '1') return;
+        const raw = sessionStorage.getItem('medikit_add_prefill');
+        if (!raw) return;
+        sessionStorage.removeItem('medikit_add_prefill');
+        try {
+            const data = JSON.parse(raw);
+            setForm(prev => ({
+                ...prev,
+                name:         data.name         || prev.name,
+                purpose:      data.purpose      || prev.purpose,
+                instructions: data.instructions || prev.instructions,
+                ...(data.unit ? { unit: data.unit } : {}),
+            }));
+            setIsPrefilled(true);
+        } catch { /* ignore parse errors */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
@@ -116,6 +137,12 @@ export default function AddPillPage() {
     return (
         <div className="add-pill-container">
             <h1 className="add-pill-title">Add New Medicine</h1>
+
+            {isPrefilled && (
+                <div className="pill-prefill-notice">
+                    Pre-filled from medicine database — please review and complete all fields
+                </div>
+            )}
 
             <div className="pill-form">
 

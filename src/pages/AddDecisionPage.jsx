@@ -1,40 +1,72 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Pill, Plus } from 'lucide-react';
+import { Search, Pill, Plus, Loader } from 'lucide-react';
+import { authFetch } from '../utils/api.js';
 import '../styles/AddDecisionPage.css';
 
-const CATALOG = [
-    { name: 'Ibuprofen',            purpose: 'Pain Relief',   meta: '500mg' },
-    { name: 'Acetaminophen',        purpose: 'Pain Relief',   meta: '500mg' },
-    { name: 'Aspirin',              purpose: 'Pain Relief',   meta: '325mg' },
-    { name: 'Cetirizine',           purpose: 'Allergy',       meta: '10mg' },
-    { name: 'Loratadine',           purpose: 'Allergy',       meta: '10mg' },
-    { name: 'Omeprazole',           purpose: 'Digestive',     meta: '20mg' },
-    { name: 'Loperamide',           purpose: 'Digestive',     meta: '2mg' },
-    { name: 'Vitamin D',            purpose: 'Supplement',    meta: '1000 IU' },
-    { name: 'Vitamin C',            purpose: 'Supplement',    meta: '500mg' },
-    { name: 'Melatonin',            purpose: 'Sleep',         meta: '3mg' },
-    { name: 'Hydrocortisone Cream', purpose: 'Skin',          meta: '1%' },
-    { name: 'Antibiotic Ointment',  purpose: 'Skin',          meta: '0.5%' },
-    { name: 'Amoxicillin',          purpose: 'Antibiotic',    meta: '500mg' },
-];
+// ── API calls (proxied through backend to avoid CORS) ─────────────────────────
+
+async function searchDrugs(query) {
+    const res = await authFetch(`/api/drug-search/search?q=${encodeURIComponent(query)}`);
+    if (!res.ok) throw new Error('Search unavailable');
+    return res.json(); // string[]
+}
+
+async function enrichDrug(name) {
+    const res = await authFetch(`/api/drug-search/enrich?name=${encodeURIComponent(name)}`);
+    if (!res.ok) throw new Error('Enrich unavailable');
+    return res.json(); // { purpose, instructions, unit, photoUrl }
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export default function AddDecisionPage() {
     const navigate = useNavigate();
-    const [search, setSearch] = useState('');
 
-    const filtered = search.trim()
-        ? CATALOG.filter(
-            (item) =>
-                item.name.toLowerCase().includes(search.toLowerCase()) ||
-                item.purpose.toLowerCase().includes(search.toLowerCase())
-        )
-        : CATALOG;
+    const [search,      setSearch]      = useState('');
+    const [results,     setResults]     = useState([]); // string[]
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchError, setSearchError] = useState('');
+    const [loadingItem, setLoadingItem] = useState(null); // name of item being enriched
 
-    const handleCatalogAdd = (item) => {
-        navigate(
-            `/add/manual?name=${encodeURIComponent(item.name)}&purpose=${encodeURIComponent(item.purpose)}`
-        );
+    const debounceRef = useRef(null);
+    const anyLoading  = loadingItem !== null;
+
+    const doSearch = useCallback(async (query) => {
+        setIsSearching(true);
+        setSearchError('');
+        try {
+            const found = await searchDrugs(query);
+            setResults(found);
+            if (found.length === 0) setSearchError(`No results for "${query}"`);
+        } catch {
+            setSearchError('Search unavailable. You can still add medicine manually.');
+            setResults([]);
+        } finally {
+            setIsSearching(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        clearTimeout(debounceRef.current);
+        if (search.trim().length < 3) { setResults([]); setSearchError(''); return; }
+        debounceRef.current = setTimeout(() => doSearch(search), 400);
+        return () => clearTimeout(debounceRef.current);
+    }, [search, doSearch]);
+
+    const handleCatalogAdd = async (name) => {
+        setLoadingItem(name);
+
+        let prefillData;
+        try {
+            const enriched = await enrichDrug(name);
+            prefillData = { name, ...enriched };
+        } catch {
+            prefillData = { name, purpose: '', instructions: '', unit: null };
+        }
+
+        sessionStorage.setItem('medikit_add_prefill', JSON.stringify(prefillData));
+        navigate('/add/manual?prefill=1');
     };
 
     return (
@@ -48,37 +80,60 @@ export default function AddDecisionPage() {
                     <input
                         className="add-decision-search-input"
                         type="text"
-                        placeholder="Search medicines..."
+                        placeholder="Search medicines…"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         autoFocus
+                        disabled={anyLoading}
                     />
                 </div>
             </div>
 
-            {filtered.length > 0 ? (
+            {/* Searching indicator */}
+            {isSearching && (
+                <div className="catalog-searching">
+                    <Loader size={16} className="catalog-spinner" />
+                    Searching…
+                </div>
+            )}
+
+            {/* Error / no results */}
+            {!isSearching && searchError && (
+                <div className="catalog-empty-state">{searchError}</div>
+            )}
+
+            {/* Initial hint */}
+            {!isSearching && !searchError && results.length === 0 && (
+                <div className="catalog-empty-state catalog-empty-state--hint">
+                    Type at least 3 characters to search any medicine by name
+                </div>
+            )}
+
+            {/* Results list */}
+            {!isSearching && results.length > 0 && (
                 <div className="catalog-list">
-                    {filtered.map((item) => (
-                        <div className="catalog-item" key={item.name}>
+                    {results.map((name) => (
+                        <div className="catalog-item" key={name}>
                             <div className="catalog-item-icon">
-                                <Pill size={20} color="hotpink" />
+                                <Pill size={20} color="#4F8796" />
                             </div>
                             <div className="catalog-item-details">
-                                <div className="catalog-item-name">{item.name}</div>
-                                <div className="catalog-item-meta">{item.meta} · {item.purpose}</div>
+                                <div className="catalog-item-name">{name}</div>
                             </div>
                             <button
                                 className="catalog-item-add-button"
-                                onClick={() => handleCatalogAdd(item)}
+                                onClick={() => handleCatalogAdd(name)}
+                                disabled={anyLoading}
                             >
-                                <Plus size={14} />
-                                Add
+                                {loadingItem === name
+                                    ? <Loader size={14} className="catalog-spinner" />
+                                    : <Plus size={14} />
+                                }
+                                {loadingItem === name ? 'Loading…' : 'Add'}
                             </button>
                         </div>
                     ))}
                 </div>
-            ) : (
-                <div className="catalog-empty-state">No results for "{search}"</div>
             )}
 
             <div className="add-manual-row">
@@ -86,6 +141,7 @@ export default function AddDecisionPage() {
                 <button
                     className="add-manual-button"
                     onClick={() => navigate('/add/manual')}
+                    disabled={anyLoading}
                 >
                     Add manually
                 </button>

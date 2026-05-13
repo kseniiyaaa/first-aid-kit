@@ -3,10 +3,11 @@ const cors = require('cors');
 require('dotenv').config();
 
 const { startReminderEmailJob } = require('./jobs/reminderEmailJob');
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
-const medicineRoutes = require('./routes/medicines');
-const reminderRoutes = require('./routes/reminders');
+const authRoutes       = require('./routes/auth');
+const userRoutes       = require('./routes/users');
+const medicineRoutes   = require('./routes/medicines');
+const reminderRoutes   = require('./routes/reminders');
+const drugSearchRoutes = require('./routes/drugSearch');
 const { createUsersTable } = require('./models/User');
 const { createMedicinesTable } = require('./models/Medicine');
 const { createPasswordResetTokensTable } = require('./models/PasswordResetToken');
@@ -21,6 +22,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/medicines', medicineRoutes);
 app.use('/api/reminders', reminderRoutes);
+app.use('/api/drug-search', drugSearchRoutes);
 
 const PORT = process.env.PORT || 3001;
 
