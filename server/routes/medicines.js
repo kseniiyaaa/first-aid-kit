@@ -8,6 +8,7 @@ const {
     deductMedicineStock,
     deleteMedicine,
 } = require('../models/Medicine');
+const { checkAndSendAlerts } = require('../utils/alertHelpers');
 
 const router = express.Router();
 
@@ -38,6 +39,9 @@ router.post('/intake', requireAuth, async (req, res) => {
         }
 
         res.json(results);
+        // One batched call → one grouped email per user, not one per medicine
+        const ids = results.map(m => m.id);
+        if (ids.length) checkAndSendAlerts(ids).catch(() => {});
     } catch (err) {
         console.error('Log intake error:', err);
         res.status(500).json({ error: 'Server error' });
@@ -65,6 +69,7 @@ router.post('/', requireAuth, async (req, res) => {
         }
         const medicine = await createMedicine(req.userId, req.body);
         res.status(201).json(medicine);
+        checkAndSendAlerts([medicine.id]).catch(() => {});
     } catch (err) {
         console.error('Create medicine error:', err);
         res.status(500).json({ error: 'Server error' });
@@ -81,6 +86,7 @@ router.put('/:id', requireAuth, async (req, res) => {
         const medicine = await updateMedicine(req.params.id, req.userId, req.body);
         if (!medicine) return res.status(404).json({ error: 'Medicine not found' });
         res.json(medicine);
+        checkAndSendAlerts([medicine.id]).catch(() => {});
     } catch (err) {
         console.error('Update medicine error:', err);
         res.status(500).json({ error: 'Server error' });

@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const { startReminderEmailJob } = require('./jobs/reminderEmailJob');
+const { startStockAlertJob }   = require('./jobs/stockAlertJob');
 const authRoutes       = require('./routes/auth');
 const userRoutes       = require('./routes/users');
 const medicineRoutes   = require('./routes/medicines');
@@ -32,6 +33,7 @@ Promise.all([createUsersTable(), createMedicinesTable(), createPasswordResetToke
             console.log(`Server running on http://localhost:${PORT}`);
         });
         startReminderEmailJob();
+        startStockAlertJob();
     })
     .catch((err) => {
         console.error('Failed to initialize database:', err.message);

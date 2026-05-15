@@ -1,5 +1,6 @@
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
+const { checkAndSendAlerts } = require('../utils/alertHelpers');
 const {
     getRemindersByUserId,
     getReminderById,
@@ -77,6 +78,9 @@ router.patch('/:id/taken', requireAuth, async (req, res) => {
         const result = await toggleReminderTaken(req.params.id, req.userId);
         if (!result) return res.status(404).json({ error: 'Reminder not found' });
         res.json(result); // { reminder, medicine }
+        if (result.medicine?.id) {
+            checkAndSendAlerts([result.medicine.id]).catch(() => {});
+        }
     } catch (err) {
         console.error('Toggle reminder taken error:', err);
         res.status(500).json({ error: 'Server error' });

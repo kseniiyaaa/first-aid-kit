@@ -153,7 +153,8 @@ const getDueReminders = async (currentTime) => {
          FROM reminders r
          JOIN users u ON u.id = r.user_id
          WHERE
-             TO_CHAR(r.remind_at, 'HH24:MI') = $1
+             u.is_email_verified = TRUE
+             AND TO_CHAR(r.remind_at, 'HH24:MI') = $1
              AND (
                  (r.recurrence = 'none'
                      AND DATE(r.remind_at) = CURRENT_DATE

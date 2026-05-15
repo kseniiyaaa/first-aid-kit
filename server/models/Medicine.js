@@ -17,8 +17,10 @@ const createMedicinesTable = async () => {
             updated_at       TIMESTAMP DEFAULT NOW()
         )
     `);
-    // Migration for existing databases
+    // Migrations for existing databases
     await pool.query(`ALTER TABLE medicines ADD COLUMN IF NOT EXISTS photo TEXT`);
+    await pool.query(`ALTER TABLE medicines ADD COLUMN IF NOT EXISTS expiry_notified_at    TIMESTAMP DEFAULT NULL`);
+    await pool.query(`ALTER TABLE medicines ADD COLUMN IF NOT EXISTS low_stock_notified_at TIMESTAMP DEFAULT NULL`);
 };
 
 const getMedicinesByUserId = async (userId) => {
@@ -80,4 +82,76 @@ const deleteMedicine = async (id, userId) => {
     return result.rows[0] || null;
 };
 
-module.exports = { createMedicinesTable, getMedicinesByUserId, getMedicineById, createMedicine, updateMedicine, deductMedicineStock, deleteMedicine };
+// ── Alert queries ─────────────────────────────────────────────────────────────
+
+const LOW_STOCK_THRESHOLD = 5;
+
+/**
+ * Returns medicines expiring within `daysAhead` days that have not yet been
+ * notified (expiry_notified_at IS NULL). Only for verified-email users.
+ */
+const getMedicinesExpiringSoon = async (daysAhead = 7) => {
+    const result = await pool.query(
+        `SELECT m.id, m.user_id, m.name, m.expiration_date,
+                u.email AS user_email, u.full_name
+         FROM medicines m
+         JOIN users u ON u.id = m.user_id
+         WHERE m.expiration_date IS NOT NULL
+           AND m.expiration_date - CURRENT_DATE BETWEEN 0 AND $1
+           AND u.is_email_verified = TRUE
+           AND m.expiry_notified_at IS NULL`,
+        [daysAhead]
+    );
+    return result.rows;
+};
+
+/**
+ * Returns medicines with quantity ≤ LOW_STOCK_THRESHOLD that haven't been
+ * notified in the last 7 days. Only for verified-email users.
+ */
+const getLowStockMedicines = async () => {
+    const result = await pool.query(
+        `SELECT m.id, m.user_id, m.name, m.quantity, m.unit,
+                u.email AS user_email, u.full_name
+         FROM medicines m
+         JOIN users u ON u.id = m.user_id
+         WHERE m.quantity IS NOT NULL
+           AND m.quantity <= $1
+           AND u.is_email_verified = TRUE
+           AND (m.low_stock_notified_at IS NULL
+                OR m.low_stock_notified_at < NOW() - INTERVAL '7 days')`,
+        [LOW_STOCK_THRESHOLD]
+    );
+    return result.rows;
+};
+
+const markExpiryNotified = async (ids) => {
+    if (!ids.length) return;
+    await pool.query(
+        `UPDATE medicines SET expiry_notified_at = NOW() WHERE id = ANY($1)`,
+        [ids]
+    );
+};
+
+const markLowStockNotified = async (ids) => {
+    if (!ids.length) return;
+    await pool.query(
+        `UPDATE medicines SET low_stock_notified_at = NOW() WHERE id = ANY($1)`,
+        [ids]
+    );
+};
+
+module.exports = {
+    createMedicinesTable,
+    getMedicinesByUserId,
+    getMedicineById,
+    createMedicine,
+    updateMedicine,
+    deductMedicineStock,
+    deleteMedicine,
+    getMedicinesExpiringSoon,
+    getLowStockMedicines,
+    markExpiryNotified,
+    markLowStockNotified,
+    LOW_STOCK_THRESHOLD,
+};
