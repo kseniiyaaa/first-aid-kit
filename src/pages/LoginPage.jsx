@@ -31,14 +31,14 @@ export default function LoginPage() {
     const validate = () => {
         const newErrors = {};
         if (!email.trim()) {
-            newErrors.email = 'Email is required';
+            newErrors.email = 'Email обов\'язковий';
         } else if (!EMAIL_REGEX.test(email)) {
-            newErrors.email = 'Enter a valid email address';
+            newErrors.email = 'Введіть дійсну адресу email';
         }
         if (!password) {
-            newErrors.password = 'Password is required';
+            newErrors.password = 'Пароль обов\'язковий';
         } else if (password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
+            newErrors.password = 'Пароль має містити щонайменше 6 символів';
         }
         return newErrors;
     };
@@ -64,14 +64,14 @@ export default function LoginPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setServerError(data.error || 'Login failed. Please try again.');
+                setServerError(data.error || 'Помилка входу. Спробуйте ще раз.');
                 return;
             }
 
             login(data.token, data.user);
             navigate('/home');
         } catch {
-            setServerError('Network error. Please check your connection.');
+            setServerError('Помилка мережі. Перевірте з\'єднання.');
         } finally {
             setIsLoading(false);
         }
@@ -84,11 +84,11 @@ export default function LoginPage() {
     return (
         <div className="auth-page">
             <div className="auth-form-container">
-                <h2 className="auth-form-title">Welcome to MediKit</h2>
+                <h2 className="auth-form-title">Ласкаво просимо до MediKit</h2>
 
                 {passwordWasReset && (
                     <div className="auth-reset-success">
-                        Password updated! You can now log in.
+                        Пароль оновлено! Тепер ви можете увійти.
                     </div>
                 )}
 
@@ -110,7 +110,7 @@ export default function LoginPage() {
                         <input
                             className={`auth-input${errors.password ? ' auth-input--invalid' : ''}`}
                             type={showPassword ? 'text' : 'password'}
-                            placeholder="Password"
+                            placeholder="Пароль"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             onKeyDown={handleKeyDown}
@@ -138,7 +138,7 @@ export default function LoginPage() {
                         onClick={handleLogin}
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Logging in…' : 'Log In'}
+                        {isLoading ? 'Вхід…' : 'Увійти'}
                     </button>
                 </div>
 
@@ -147,7 +147,7 @@ export default function LoginPage() {
                         className="auth-link-button"
                         onClick={() => navigate('/forgot-password', { state: { email } })}
                     >
-                        Forgot password?
+                        Забули пароль?
                     </button>
                 </div>
 
@@ -157,7 +157,7 @@ export default function LoginPage() {
                         onClick={() => navigate('/signup')}
                         disabled={isLoading}
                     >
-                        Sign Up
+                        Зареєструватись
                     </button>
                 </div>
             </div>

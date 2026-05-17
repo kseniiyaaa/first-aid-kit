@@ -79,11 +79,11 @@ export default function AddPillPage() {
         const file = e.target.files?.[0];
         if (!file) return;
         if (!file.type.startsWith('image/')) {
-            setPhotoError('Please select an image file');
+            setPhotoError('Будь ласка, виберіть файл зображення');
             return;
         }
         if (file.size > 10 * 1024 * 1024) {
-            setPhotoError('Image must be smaller than 10 MB');
+            setPhotoError('Зображення має бути менше 10 МБ');
             return;
         }
         setPhotoError('');
@@ -91,7 +91,7 @@ export default function AddPillPage() {
             const resized = await resizeImage(file);
             setPhoto(resized);
         } catch {
-            setPhotoError('Failed to process image. Please try another file.');
+            setPhotoError('Не вдалося обробити зображення. Спробуйте інший файл.');
         }
         // Reset input so the same file can be re-selected after removal
         e.target.value = '';
@@ -99,9 +99,9 @@ export default function AddPillPage() {
 
     const validate = () => {
         const errs = {};
-        if (!form.name.trim()) errs.name = 'Medicine name is required';
+        if (!form.name.trim()) errs.name = 'Назва ліків обов\'язкова';
         if (form.quantity !== '' && (isNaN(Number(form.quantity)) || Number(form.quantity) < 0)) {
-            errs.quantity = 'Quantity must be a positive number';
+            errs.quantity = 'Кількість має бути позитивним числом';
         }
         return errs;
     };
@@ -125,10 +125,10 @@ export default function AddPillPage() {
                 }),
             });
             const data = await res.json();
-            if (!res.ok) { setServerError(data.error || 'Failed to add medicine'); return; }
+            if (!res.ok) { setServerError(data.error || 'Помилка додавання ліків'); return; }
             navigate('/kit');
         } catch {
-            setServerError('Network error. Please try again.');
+            setServerError('Помилка мережі. Спробуйте ще раз.');
         } finally {
             setIsLoading(false);
         }
@@ -136,11 +136,11 @@ export default function AddPillPage() {
 
     return (
         <div className="add-pill-container">
-            <h1 className="add-pill-title">Add New Medicine</h1>
+            <h1 className="add-pill-title">Додати новий препарат</h1>
 
             {isPrefilled && (
                 <div className="pill-prefill-notice">
-                    Pre-filled from medicine database — please review and complete all fields
+                    Форму заповнено з бази даних — перевірте та доповніть всі поля
                 </div>
             )}
 
@@ -149,17 +149,17 @@ export default function AddPillPage() {
                 {/* Photo */}
                 <div className="pill-form-field">
                     <label className="pill-form-label">
-                        Photo <span className="pill-form-optional">(optional)</span>
+                        Фото <span className="pill-form-optional">(необов'язково)</span>
                     </label>
 
                     {photo ? (
                         <div className="pill-photo-preview-wrapper">
-                            <img src={photo} alt="Medicine preview" className="pill-photo-preview" />
+                            <img src={photo} alt="Попередній перегляд" className="pill-photo-preview" />
                             <button
                                 type="button"
                                 className="pill-photo-remove"
                                 onClick={() => setPhoto(null)}
-                                aria-label="Remove photo"
+                                aria-label="Видалити фото"
                             >
                                 <X size={15} />
                             </button>
@@ -172,7 +172,7 @@ export default function AddPillPage() {
                             disabled={isLoading}
                         >
                             <ImagePlus size={18} />
-                            Add photo
+                            Додати фото
                         </button>
                     )}
 
@@ -189,12 +189,12 @@ export default function AddPillPage() {
                 {/* Name */}
                 <div className="pill-form-field">
                     <label className="pill-form-label">
-                        Name <span className="pill-form-required">*</span>
+                        Назва <span className="pill-form-required">*</span>
                     </label>
                     <input
                         className={`pill-form-input${errors.name ? ' pill-form-input--invalid' : ''}`}
                         type="text"
-                        placeholder="e.g., Ibuprofen"
+                        placeholder="напр., Ібупрофен"
                         value={form.name}
                         onChange={set('name')}
                         disabled={isLoading}
@@ -203,11 +203,11 @@ export default function AddPillPage() {
                 </div>
 
                 <div className="pill-form-field">
-                    <label className="pill-form-label">Purpose</label>
+                    <label className="pill-form-label">Призначення</label>
                     <input
                         className="pill-form-input"
                         type="text"
-                        placeholder="e.g., Pain relief, Allergy"
+                        placeholder="напр., Знеболення, Алергія"
                         value={form.purpose}
                         onChange={set('purpose')}
                         disabled={isLoading}
@@ -215,11 +215,11 @@ export default function AddPillPage() {
                 </div>
 
                 <div className="pill-form-field">
-                    <label className="pill-form-label">Dosage</label>
+                    <label className="pill-form-label">Дозування</label>
                     <input
                         className="pill-form-input"
                         type="text"
-                        placeholder="e.g., 500mg, 1 tablet"
+                        placeholder="напр., 500мг, 1 таблетка"
                         value={form.dosage}
                         onChange={set('dosage')}
                         disabled={isLoading}
@@ -228,12 +228,12 @@ export default function AddPillPage() {
 
                 <div className="pill-form-row">
                     <div className="pill-form-field">
-                        <label className="pill-form-label">Quantity</label>
+                        <label className="pill-form-label">Кількість</label>
                         <input
                             className={`pill-form-input${errors.quantity ? ' pill-form-input--invalid' : ''}`}
                             type="number"
                             min="0"
-                            placeholder="e.g., 30"
+                            placeholder="напр., 30"
                             value={form.quantity}
                             onChange={set('quantity')}
                             disabled={isLoading}
@@ -241,7 +241,7 @@ export default function AddPillPage() {
                         {errors.quantity && <span className="pill-form-field-error">{errors.quantity}</span>}
                     </div>
                     <div className="pill-form-field">
-                        <label className="pill-form-label">Unit</label>
+                        <label className="pill-form-label">Одиниця</label>
                         <select
                             className="pill-form-select"
                             value={form.unit}
@@ -254,7 +254,7 @@ export default function AddPillPage() {
                 </div>
 
                 <div className="pill-form-field">
-                    <label className="pill-form-label">Expiration Date</label>
+                    <label className="pill-form-label">Термін придатності</label>
                     <input
                         className="pill-form-input"
                         type="date"
@@ -265,10 +265,10 @@ export default function AddPillPage() {
                 </div>
 
                 <div className="pill-form-field">
-                    <label className="pill-form-label">Instructions</label>
+                    <label className="pill-form-label">Інструкції</label>
                     <textarea
                         className="pill-form-textarea"
-                        placeholder="e.g., Take 1 tablet every 4–6 hours as needed."
+                        placeholder="напр., Приймати 1 таблетку кожні 4–6 годин за потреби."
                         value={form.instructions}
                         onChange={set('instructions')}
                         disabled={isLoading}
@@ -284,14 +284,14 @@ export default function AddPillPage() {
                         onClick={handleSubmit}
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Adding…' : 'Add Medicine'}
+                        {isLoading ? 'Додавання…' : 'Додати ліки'}
                     </button>
                     <button
                         className="pill-form-cancel-button"
                         onClick={() => navigate('/kit')}
                         disabled={isLoading}
                     >
-                        Cancel
+                        Скасувати
                     </button>
                 </div>
             </div>

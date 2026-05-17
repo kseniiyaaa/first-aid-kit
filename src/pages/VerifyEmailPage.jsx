@@ -18,7 +18,7 @@ export default function VerifyEmailPage() {
     useEffect(() => {
         if (!token) {
             setStatus('error');
-            setMessage('Invalid verification link — no token found.');
+            setMessage('Недійсне посилання верифікації — токен не знайдено.');
             return;
         }
 
@@ -59,7 +59,7 @@ export default function VerifyEmailPage() {
                 // Ignore cancellation from StrictMode cleanup
                 if (err.name === 'AbortError') return;
                 setStatus('error');
-                setMessage('Network error. Please check your connection and try again.');
+                setMessage('Помилка мережі. Перевірте з\'єднання та спробуйте ще раз.');
             });
 
         return () => controller.abort();
@@ -72,15 +72,15 @@ export default function VerifyEmailPage() {
                 {status === 'loading' && (
                     <>
                         <LoaderCircle className="verify-email-icon verify-email-icon--spin" size={48} />
-                        <h2 className="verify-email-title">Verifying…</h2>
-                        <p className="verify-email-subtitle">Please wait a moment.</p>
+                        <h2 className="verify-email-title">Перевірка…</h2>
+                        <p className="verify-email-subtitle">Зачекайте, будь ласка.</p>
                     </>
                 )}
 
                 {status === 'success' && (
                     <>
                         <CircleCheck className="verify-email-icon verify-email-icon--success" size={52} />
-                        <h2 className="verify-email-title">All done!</h2>
+                        <h2 className="verify-email-title">Готово!</h2>
                         <p className="verify-email-subtitle">{message}</p>
                         <button
                             className="verify-email-button"
@@ -94,7 +94,7 @@ export default function VerifyEmailPage() {
                                 }
                             }}
                         >
-                            {user ? 'Go to Account' : 'Log In'}
+                            {user ? 'До акаунту' : 'Увійти'}
                         </button>
                     </>
                 )}
@@ -102,13 +102,13 @@ export default function VerifyEmailPage() {
                 {status === 'error' && (
                     <>
                         <CircleX className="verify-email-icon verify-email-icon--error" size={52} />
-                        <h2 className="verify-email-title">Verification failed</h2>
+                        <h2 className="verify-email-title">Помилка верифікації</h2>
                         <p className="verify-email-subtitle">{message}</p>
                         <button
                             className="verify-email-button verify-email-button--secondary"
                             onClick={() => navigate(user ? '/account' : '/login')}
                         >
-                            {user ? 'Back to Account' : 'Go to Login'}
+                            {user ? 'До акаунту' : 'До входу'}
                         </button>
                     </>
                 )}

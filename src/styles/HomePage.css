@@ -53,6 +53,7 @@
 .btn-primary {
     background-color: #30BDE8;
     color: #0D171C;
+    font-weight: 600;
 }
 
 .btn-primary:hover {
@@ -62,6 +63,7 @@
 .btn-secondary {
     background-color: #7dd3fc;
     color: #0c4a6e;
+    font-weight: 600;
 }
 
 .btn-secondary:hover {
@@ -85,7 +87,7 @@
     border-radius: 20px;
     padding: 8px 16px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .btn-view-kit:hover {

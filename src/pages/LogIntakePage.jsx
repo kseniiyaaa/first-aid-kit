@@ -45,9 +45,9 @@ export default function LogIntakePage() {
         const errs = {};
         rows.forEach((r) => {
             if (!r.medicineId) {
-                errs[r.uid] = 'Select a medicine';
+                errs[r.uid] = 'Оберіть ліки';
             } else if (!r.amount || Number(r.amount) <= 0) {
-                errs[r.uid] = 'Enter a valid amount';
+                errs[r.uid] = 'Введіть коректну кількість';
             }
         });
         return errs;
@@ -71,7 +71,7 @@ export default function LogIntakePage() {
                 body:   JSON.stringify({ items }),
             });
             const data = await res.json();
-            if (!res.ok) { setServerError(data.error || 'Something went wrong'); return; }
+            if (!res.ok) { setServerError(data.error || 'Щось пішло не так'); return; }
 
             // Build result rows enriched with the amount deducted
             const deductedById = Object.fromEntries(
@@ -84,7 +84,7 @@ export default function LogIntakePage() {
                 }))
             );
         } catch {
-            setServerError('Network error. Please try again.');
+            setServerError('Помилка мережі. Спробуйте ще раз.');
         } finally {
             setIsLoading(false);
         }
@@ -96,13 +96,13 @@ export default function LogIntakePage() {
             <div className="log-intake-container">
                 <div className="log-intake-success">
                     <CheckCircle size={48} className="log-intake-success-icon" />
-                    <h2 className="log-intake-success-title">Stock updated!</h2>
+                    <h2 className="log-intake-success-title">Запас оновлено!</h2>
                     <ul className="log-intake-success-list">
                         {results.map((m) => (
                             <li key={m.id} className="log-intake-success-item">
                                 <span className="log-intake-success-name">{m.name}</span>
                                 <span className="log-intake-success-detail">
-                                    −{m.deducted} {m.unit || 'units'} &nbsp;·&nbsp; {m.quantity} {m.unit || 'units'} remaining
+                                    −{m.deducted} {m.unit || 'одиниць'} &nbsp;·&nbsp; {m.quantity} {m.unit || 'одиниць'} залишилось
                                 </span>
                             </li>
                         ))}
@@ -111,7 +111,7 @@ export default function LogIntakePage() {
                         className="log-intake-done-btn"
                         onClick={() => navigate('/home')}
                     >
-                        Done
+                        Готово
                     </button>
                 </div>
             </div>
@@ -121,16 +121,16 @@ export default function LogIntakePage() {
     // ── Form ─────────────────────────────────────────────────────────────────
     return (
         <div className="log-intake-container">
-            <h1 className="log-intake-title">Log Intake</h1>
+            <h1 className="log-intake-title">Зафіксувати прийом</h1>
             <p className="log-intake-subtitle">
-                Record medicines you took outside your scheduled reminders. Stock will be updated automatically.
+                Зафіксуйте ліки, прийняті поза розкладом нагадувань. Запас буде оновлено автоматично.
             </p>
 
             {medicines.length === 0 ? (
                 <p className="log-intake-empty">
-                    No medicines with quantity tracking found in your kit.{' '}
+                    У вашій аптечці немає ліків з відстеженням кількості.{' '}
                     <button className="log-intake-link" onClick={() => navigate('/add')}>
-                        Add a medicine
+                        Додати ліки
                     </button>
                 </p>
             ) : (
@@ -145,12 +145,12 @@ export default function LogIntakePage() {
                         return (
                             <div key={row.uid} className="log-intake-row">
                                 <div className="log-intake-row-header">
-                                    <span className="log-intake-row-label">Medicine {idx + 1}</span>
+                                    <span className="log-intake-row-label">Ліки {idx + 1}</span>
                                     {rows.length > 1 && (
                                         <button
                                             className="log-intake-remove-btn"
                                             onClick={() => removeRow(row.uid)}
-                                            aria-label="Remove row"
+                                            aria-label="Видалити рядок"
                                         >
                                             <X size={15} />
                                         </button>
@@ -163,10 +163,10 @@ export default function LogIntakePage() {
                                     onChange={(e) => updateRow(row.uid, 'medicineId', e.target.value)}
                                     disabled={isLoading}
                                 >
-                                    <option value="">— Select a medicine —</option>
+                                    <option value="">— Оберіть ліки —</option>
                                     {available.map((m) => (
                                         <option key={m.id} value={String(m.id)}>
-                                            {m.name}{m.quantity != null ? ` (${m.quantity} ${m.unit || 'units'} in stock)` : ''}
+                                            {m.name}{m.quantity != null ? ` (${m.quantity} ${m.unit || 'одиниць'} в наявності)` : ''}
                                         </option>
                                     ))}
                                 </select>
@@ -177,7 +177,7 @@ export default function LogIntakePage() {
                                         type="number"
                                         min="0.01"
                                         step="any"
-                                        placeholder="Amount taken"
+                                        placeholder="Прийнята кількість"
                                         value={row.amount}
                                         onChange={(e) => updateRow(row.uid, 'amount', e.target.value)}
                                         disabled={isLoading}
@@ -202,7 +202,7 @@ export default function LogIntakePage() {
                             disabled={isLoading}
                         >
                             <Plus size={15} />
-                            Add another medicine
+                            Додати ще ліки
                         </button>
                     )}
 
@@ -216,14 +216,14 @@ export default function LogIntakePage() {
                             onClick={handleSubmit}
                             disabled={isLoading}
                         >
-                            {isLoading ? 'Saving…' : 'Confirm Intake'}
+                            {isLoading ? 'Збереження…' : 'Підтвердити прийом'}
                         </button>
                         <button
                             className="log-intake-cancel-btn"
                             onClick={() => navigate('/home')}
                             disabled={isLoading}
                         >
-                            Cancel
+                            Скасувати
                         </button>
                     </div>
                 </div>

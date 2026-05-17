@@ -69,7 +69,7 @@ export default function AccountPage() {
     // ── Change Name ─────────────────────────────────────────
     const handleChangeName = async () => {
         if (!nameValue.trim() || nameValue.trim().length < 2) {
-            setNameError('Name must be at least 2 characters');
+            setNameError('Ім\'я має містити щонайменше 2 символи');
             return;
         }
         setNameError('');
@@ -83,10 +83,10 @@ export default function AccountPage() {
                 setNameFeedback({ error: data.error, success: '' });
             } else {
                 updateUser({ fullName: data.fullName });
-                setNameFeedback({ error: '', success: 'Name updated successfully' });
+                setNameFeedback({ error: '', success: 'Ім\'я успішно оновлено' });
             }
         } catch {
-            setNameFeedback({ error: 'Network error. Please try again.', success: '' });
+            setNameFeedback({ error: 'Помилка мережі. Спробуйте ще раз.', success: '' });
         } finally {
             setNameLoading(false);
         }
@@ -97,7 +97,7 @@ export default function AccountPage() {
 
     const handleChangeEmail = async () => {
         if (!emailValue.trim() || !EMAIL_REGEX.test(emailValue)) {
-            setEmailError('Enter a valid email address');
+            setEmailError('Введіть дійсну адресу email');
             return;
         }
         setEmailError('');
@@ -114,7 +114,7 @@ export default function AccountPage() {
                 setEmailFeedback({ error: '', success: data.message });
             }
         } catch {
-            setEmailFeedback({ error: 'Network error. Please try again.', success: '' });
+            setEmailFeedback({ error: 'Помилка мережі. Спробуйте ще раз.', success: '' });
         } finally {
             setEmailLoading(false);
         }
@@ -133,7 +133,7 @@ export default function AccountPage() {
                 // sync it so the UI reflects reality
                 if (data.error === 'Email is already verified') {
                     updateUser({ emailVerified: true });
-                    setEmailFeedback({ error: '', success: 'Your email is already verified.' });
+                    setEmailFeedback({ error: '', success: 'Ваш email вже підтверджений.' });
                 } else {
                     setEmailFeedback({ error: data.error, success: '' });
                 }
@@ -141,7 +141,7 @@ export default function AccountPage() {
                 setEmailFeedback({ error: '', success: data.message });
             }
         } catch {
-            setEmailFeedback({ error: 'Network error. Please try again.', success: '' });
+            setEmailFeedback({ error: 'Помилка мережі. Спробуйте ще раз.', success: '' });
         } finally {
             setResendLoading(false);
         }
@@ -150,11 +150,11 @@ export default function AccountPage() {
     // ── Change Password ─────────────────────────────────────
     const validatePassword = () => {
         const errs = {};
-        if (!currentPassword) errs.current = 'Current password is required';
-        if (!newPassword) errs.new = 'New password is required';
-        else if (newPassword.length < 8) errs.new = 'Password must be at least 8 characters';
-        if (!confirmPassword) errs.confirm = 'Please confirm your new password';
-        else if (newPassword !== confirmPassword) errs.confirm = 'Passwords do not match';
+        if (!currentPassword) errs.current = 'Поточний пароль обов\'язковий';
+        if (!newPassword) errs.new = 'Новий пароль обов\'язковий';
+        else if (newPassword.length < 8) errs.new = 'Пароль має містити щонайменше 8 символів';
+        if (!confirmPassword) errs.confirm = 'Підтвердіть новий пароль';
+        else if (newPassword !== confirmPassword) errs.confirm = 'Паролі не збігаються';
         return errs;
     };
 
@@ -172,10 +172,10 @@ export default function AccountPage() {
                 setPasswordFeedback({ error: data.error, success: '' });
             } else {
                 setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
-                setPasswordFeedback({ error: '', success: 'Password updated successfully' });
+                setPasswordFeedback({ error: '', success: 'Пароль успішно оновлено' });
             }
         } catch {
-            setPasswordFeedback({ error: 'Network error. Please try again.', success: '' });
+            setPasswordFeedback({ error: 'Помилка мережі. Спробуйте ще раз.', success: '' });
         } finally {
             setPasswordLoading(false);
         }
@@ -186,12 +186,11 @@ export default function AccountPage() {
 
     return (
         <div className="account-page-container">
-            <button className="back-btn" onClick={() => navigate('/home')}>← Home</button>
-            <h1 className="account-page-title">Account Settings</h1>
+            <button className="back-btn" onClick={() => navigate('/home')}>← Головна</button>
+            <h1 className="account-page-title">Налаштування акаунту</h1>
 
             {/* Profile header */}
             <div className="account-profile-header">
-                {/*<div className="account-avatar" />*/}
                 <div className="account-display-name">{user?.fullName ?? '—'}</div>
                 <div className="account-user-email">
                     <span>{user?.email ?? '—'}</span>
@@ -203,9 +202,9 @@ export default function AccountPage() {
 
             {/* ── Profile ── */}
             <section className="account-section">
-                <h2 className="account-section-title">Profile</h2>
+                <h2 className="account-section-title">Профіль</h2>
                 <div className="account-input-field">
-                    <label className="account-input-label">Name</label>
+                    <label className="account-input-label">Ім'я</label>
                     <input
                         className={`account-input${nameError ? ' account-input--invalid' : ''}`}
                         type="text"
@@ -217,7 +216,7 @@ export default function AccountPage() {
                 </div>
                 <div className="account-action-row">
                     <button className="account-change-button" onClick={handleChangeName} disabled={nameLoading}>
-                        {nameLoading ? 'Saving…' : 'Change Name'}
+                        {nameLoading ? 'Збереження…' : 'Змінити ім\'я'}
                     </button>
                     <SectionFeedback {...nameFeedback} />
                 </div>
@@ -229,35 +228,35 @@ export default function AccountPage() {
 
                 {/* Current email + verified badge */}
                 <div className="account-current-email-row">
-                    <span className="account-current-email-label">Current:</span>
+                    <span className="account-current-email-label">Поточний:</span>
                     <span className="account-current-email-value">{user?.email ?? '—'}</span>
                     {user?.emailVerified
-                        ? <span className="account-email-badge account-email-badge--verified">Verified</span>
-                        : <span className="account-email-badge account-email-badge--unverified">Not verified</span>
+                        ? <span className="account-email-badge account-email-badge--verified">Підтверджений</span>
+                        : <span className="account-email-badge account-email-badge--unverified">Не підтверджений</span>
                     }
                 </div>
 
                 {/* Resend verification if not verified */}
                 {!user?.emailVerified && (
                     <div className="account-unverified-notice">
-                        Check your inbox for the verification email, or{' '}
+                        Перевірте вашу поштову скриньку або{' '}
                         <button
                             className="account-resend-link"
                             onClick={handleResendVerification}
                             disabled={resendLoading}
                         >
-                            {resendLoading ? 'Sending…' : 'resend it'}
+                            {resendLoading ? 'Надсилання…' : 'надішліть повторно'}
                         </button>.
                     </div>
                 )}
 
                 {/* Change email form */}
                 <div className="account-input-field" style={{ marginTop: '12px' }}>
-                    <label className="account-input-label">New email address</label>
+                    <label className="account-input-label">Нова адреса email</label>
                     <input
                         className={`account-input${emailError ? ' account-input--invalid' : ''}`}
                         type="email"
-                        placeholder="Enter new email"
+                        placeholder="Введіть новий email"
                         value={emailValue}
                         onChange={(e) => setEmailValue(e.target.value)}
                         disabled={emailLoading}
@@ -266,7 +265,7 @@ export default function AccountPage() {
                 </div>
                 <div className="account-action-row">
                     <button className="account-change-button" onClick={handleChangeEmail} disabled={emailLoading}>
-                        {emailLoading ? 'Sending…' : 'Change Email'}
+                        {emailLoading ? 'Надсилання…' : 'Змінити email'}
                     </button>
                     <SectionFeedback {...emailFeedback} />
                 </div>
@@ -274,15 +273,15 @@ export default function AccountPage() {
 
             {/* ── Security (password) ── */}
             <section className="account-section">
-                <h2 className="account-section-title">Security</h2>
+                <h2 className="account-section-title">Безпека</h2>
 
                 <div className="account-input-field">
-                    <label className="account-input-label">Current Password</label>
+                    <label className="account-input-label">Поточний пароль</label>
                     <div className="account-password-wrapper">
                         <input
                             className={`account-input${passwordErrors.current ? ' account-input--invalid' : ''}`}
                             type={showCurrentPwd ? 'text' : 'password'}
-                            placeholder="Enter current password"
+                            placeholder="Введіть поточний пароль"
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             disabled={passwordLoading}
@@ -295,12 +294,12 @@ export default function AccountPage() {
                 </div>
 
                 <div className="account-input-field">
-                    <label className="account-input-label">New Password</label>
+                    <label className="account-input-label">Новий пароль</label>
                     <div className="account-password-wrapper">
                         <input
                             className={`account-input${passwordErrors.new ? ' account-input--invalid' : ''}`}
                             type={showNewPwd ? 'text' : 'password'}
-                            placeholder="Min. 8 characters"
+                            placeholder="Мін. 8 символів"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             disabled={passwordLoading}
@@ -313,12 +312,12 @@ export default function AccountPage() {
                 </div>
 
                 <div className="account-input-field">
-                    <label className="account-input-label">Confirm New Password</label>
+                    <label className="account-input-label">Підтвердіть новий пароль</label>
                     <div className="account-password-wrapper">
                         <input
                             className={`account-input${passwordErrors.confirm ? ' account-input--invalid' : ''}`}
                             type={showConfirmPwd ? 'text' : 'password'}
-                            placeholder="Repeat new password"
+                            placeholder="Повторіть новий пароль"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             disabled={passwordLoading}
@@ -332,7 +331,7 @@ export default function AccountPage() {
 
                 <div className="account-action-row">
                     <button className="account-change-button" onClick={handleChangePassword} disabled={passwordLoading}>
-                        {passwordLoading ? 'Saving…' : 'Change Password'}
+                        {passwordLoading ? 'Збереження…' : 'Змінити пароль'}
                     </button>
                     <SectionFeedback {...passwordFeedback} />
                 </div>
@@ -340,9 +339,9 @@ export default function AccountPage() {
 
             {/* ── Session ── */}
             <section className="account-section">
-                <h2 className="account-section-title">Session</h2>
+                <h2 className="account-section-title">Сесія</h2>
                 <div className="account-action-row">
-                    <button className="account-logout-button" onClick={handleLogout}>Logout</button>
+                    <button className="account-logout-button" onClick={handleLogout}>Вийти</button>
                 </div>
             </section>
         </div>

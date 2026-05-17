@@ -22,7 +22,7 @@ export default function ItemCard({ data, isDone, onToggle }) {
                     className={`reminder-checkbox${isDone ? ' reminder-checkbox-checked' : ''}`}
                     role="checkbox"
                     aria-checked={isDone}
-                    aria-label={`Mark ${data.name} as taken`}
+                    aria-label={`Позначити ${data.name} як прийнято`}
                     onClick={(e) => { e.stopPropagation(); onToggle?.(); }}
                 >
                     {isDone && <Check size={12} strokeWidth={3} />}

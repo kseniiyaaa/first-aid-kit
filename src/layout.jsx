@@ -1,12 +1,17 @@
 import Header from "./components/header/Header.jsx";
-import {AuthProvider} from "./context/AuthProvider.jsx";
+import Footer from "./components/footer/Footer.jsx";
+import { AuthProvider } from "./context/AuthProvider.jsx";
+import './styles/layout.css';
 
 export default function Layout({ children }) {
     return (
-        <div>
+        <div className="app-shell">
             <AuthProvider>
-                <Header isLoggedIn={true} />
-                {children}
+                <Header />
+                <main className="app-main">
+                    {children}
+                </main>
+                <Footer />
             </AuthProvider>
         </div>
     );

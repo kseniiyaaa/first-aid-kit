@@ -7,10 +7,16 @@ import '../styles/KitPage.css';
 const buildMeta = (m) => {
     const parts = [];
     if (m.dosage)            parts.push(m.dosage);
-    if (m.quantity != null)  parts.push(`${m.quantity} ${m.unit || 'units'}`);
+    if (m.quantity != null)  parts.push(`${m.quantity} ${m.unit || 'одиниць'}`);
     if (m.purpose)           parts.push(m.purpose);
-    return parts.join(' · ') || 'No details';
+    return parts.join(' · ') || 'Без деталей';
 };
+
+function itemCountLabel(n) {
+    if (n === 1) return `${n} позиція`;
+    if (n >= 2 && n <= 4) return `${n} позиції`;
+    return `${n} позицій`;
+}
 
 export default function KitPage() {
     const navigate = useNavigate();
@@ -29,7 +35,7 @@ export default function KitPage() {
     }, []);
 
     const handleDeleteClick = (e, medicine) => {
-        e.stopPropagation(); // не переходити на сторінку ліків
+        e.stopPropagation();
         setDeleteError('');
         setConfirmDelete({ id: medicine.id, name: medicine.name });
     };
@@ -42,13 +48,13 @@ export default function KitPage() {
             const res = await authFetch(`/api/medicines/${confirmDelete.id}`, { method: 'DELETE' });
             if (!res.ok) {
                 const data = await res.json();
-                setDeleteError(data.error || 'Failed to delete medicine');
+                setDeleteError(data.error || 'Помилка видалення ліків');
                 return;
             }
             setMedicines((prev) => prev.filter((m) => m.id !== confirmDelete.id));
             setConfirmDelete(null);
         } catch {
-            setDeleteError('Network error. Please try again.');
+            setDeleteError('Помилка мережі. Спробуйте ще раз.');
         } finally {
             setIsDeleting(false);
         }
@@ -56,28 +62,28 @@ export default function KitPage() {
 
     return (
         <div className="kit-page-container">
-            <button className="back-btn" onClick={() => navigate('/home')}>← Home</button>
-            <h1 className="kit-page-title">First Aid Kit</h1>
+            <button className="back-btn" onClick={() => navigate('/home')}>← Головна</button>
+            <h1 className="kit-page-title">Аптечка</h1>
 
             <div className="kit-header-row">
                 <span className="kit-item-count">
-                    {isLoading ? '…' : `${medicines.length} item${medicines.length !== 1 ? 's' : ''}`}
+                    {isLoading ? '…' : itemCountLabel(medicines.length)}
                 </span>
                 <button className="kit-add-button" onClick={() => navigate('/add')}>
                     <Plus size={16} />
-                    Add Item
+                    Додати
                 </button>
             </div>
 
             {isLoading ? (
-                <div className="kit-loading">Loading your kit…</div>
+                <div className="kit-loading">Завантаження…</div>
             ) : medicines.length === 0 ? (
                 <div className="kit-empty-state">
                     <div className="kit-empty-icon">💊</div>
-                    <p className="kit-empty-message">Your kit is empty. Add your first medicine to get started.</p>
+                    <p className="kit-empty-message">Аптечка порожня. Додайте перший препарат, щоб почати.</p>
                     <button className="kit-add-first-button" onClick={() => navigate('/add')}>
                         <Plus size={16} />
-                        Add Medicine
+                        Додати ліки
                     </button>
                 </div>
             ) : (
@@ -98,8 +104,8 @@ export default function KitPage() {
                             <button
                                 className="kit-delete-button"
                                 onClick={(e) => handleDeleteClick(e, medicine)}
-                                aria-label={`Delete ${medicine.name}`}
-                                title="Delete"
+                                aria-label={`Видалити ${medicine.name}`}
+                                title="Видалити"
                             >
                                 <Trash2 size={17} />
                             </button>
@@ -112,10 +118,10 @@ export default function KitPage() {
             {confirmDelete && (
                 <div className="kit-modal-overlay" onClick={() => !isDeleting && setConfirmDelete(null)}>
                     <div className="kit-modal" onClick={(e) => e.stopPropagation()}>
-                        <h3 className="kit-modal-title">Remove medicine?</h3>
+                        <h3 className="kit-modal-title">Видалити ліки?</h3>
                         <p className="kit-modal-body">
-                            <strong>{confirmDelete.name}</strong> will be permanently removed from your kit.
-                            This action cannot be undone.
+                            <strong>{confirmDelete.name}</strong> буде назавжди видалено з вашої аптечки.
+                            Цю дію не можна скасувати.
                         </p>
                         {deleteError && <p className="kit-modal-error">{deleteError}</p>}
                         <div className="kit-modal-actions">
@@ -124,14 +130,14 @@ export default function KitPage() {
                                 onClick={() => setConfirmDelete(null)}
                                 disabled={isDeleting}
                             >
-                                Cancel
+                                Скасувати
                             </button>
                             <button
                                 className="kit-modal-btn kit-modal-btn--delete"
                                 onClick={handleDeleteConfirm}
                                 disabled={isDeleting}
                             >
-                                {isDeleting ? 'Removing…' : 'Remove'}
+                                {isDeleting ? 'Видалення…' : 'Видалити'}
                             </button>
                         </div>
                     </div>

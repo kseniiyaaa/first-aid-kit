@@ -4,11 +4,11 @@ import { authFetch } from '../utils/api.js';
 import '../styles/AddPillPage.css';
 
 const RECURRENCE_OPTIONS = [
-    { value: 'none',            label: 'Does not repeat' },
-    { value: 'daily',           label: 'Every day' },
-    { value: 'every_other_day', label: 'Every other day (Mon/Wed/Fri pattern)' },
-    { value: 'weekly',          label: 'Every week' },
-    { value: 'monthly',         label: 'Every month' },
+    { value: 'none',            label: 'Не повторюється' },
+    { value: 'daily',           label: 'Щодня' },
+    { value: 'every_other_day', label: 'Через день (пн/ср/пт)' },
+    { value: 'weekly',          label: 'Щотижня' },
+    { value: 'monthly',         label: 'Щомісяця' },
 ];
 
 /** Extracts local date and time from a TIMESTAMP string returned by pg */
@@ -79,11 +79,11 @@ export default function EditReminderPage() {
 
     const validate = () => {
         const errs = {};
-        if (!selectedMedicineId) errs.medicine = 'Please select a medicine';
-        if (!date) errs.date = 'Please select a date';
-        if (!time) errs.time = 'Please select a time';
+        if (!selectedMedicineId) errs.medicine = 'Оберіть ліки';
+        if (!date) errs.date = 'Оберіть дату';
+        if (!time) errs.time = 'Оберіть час';
         if (isRecurring && endDate && endDate < date) {
-            errs.endDate = 'End date must be on or after the start date';
+            errs.endDate = 'Дата завершення має бути не раніше дати початку';
         }
         return errs;
     };
@@ -113,10 +113,10 @@ export default function EditReminderPage() {
                 }),
             });
             const data = await res.json();
-            if (!res.ok) { setServerError(data.error || 'Failed to update reminder'); return; }
+            if (!res.ok) { setServerError(data.error || 'Помилка оновлення нагадування'); return; }
             navigate('/reminders');
         } catch {
-            setServerError('Network error. Please try again.');
+            setServerError('Помилка мережі. Спробуйте ще раз.');
         } finally {
             setIsLoading(false);
         }
@@ -125,9 +125,9 @@ export default function EditReminderPage() {
     if (notFound) {
         return (
             <div className="add-pill-container">
-                <p style={{ color: '#FB5D60' }}>Reminder not found.</p>
+                <p style={{ color: '#FB5D60' }}>Нагадування не знайдено.</p>
                 <button className="pill-form-cancel-button" onClick={() => navigate('/reminders')}>
-                    Back to Reminders
+                    До нагадувань
                 </button>
             </div>
         );
@@ -135,13 +135,13 @@ export default function EditReminderPage() {
 
     return (
         <div className="add-pill-container">
-            <h1 className="add-pill-title">Edit Reminder</h1>
+            <h1 className="add-pill-title">Редагувати нагадування</h1>
 
             <div className="pill-form">
                 {/* Medicine */}
                 <div className="pill-form-field">
                     <label className="pill-form-label">
-                        Medicine <span className="pill-form-required">*</span>
+                        Ліки <span className="pill-form-required">*</span>
                     </label>
                     <select
                         className={`pill-form-select${errors.medicine ? ' pill-form-input--invalid' : ''}`}
@@ -149,7 +149,7 @@ export default function EditReminderPage() {
                         onChange={(e) => { setSelectedMedicineId(e.target.value); setDoseAmount(''); }}
                         disabled={isLoading}
                     >
-                        <option value="">— Select a medicine —</option>
+                        <option value="">— Оберіть ліки —</option>
                         {medicines.map((m) => (
                             <option key={m.id} value={String(m.id)}>{m.name}</option>
                         ))}
@@ -163,10 +163,10 @@ export default function EditReminderPage() {
                 {selectedMedicine && (
                     <div className="pill-form-field">
                         <label className="pill-form-label">
-                            Dose amount <span className="pill-form-optional">(optional)</span>
+                            Доза <span className="pill-form-optional">(необов'язково)</span>
                         </label>
                         {selectedMedicine.quantity == null ? (
-                            <p className="reminder-dose-hint">Quantity not tracked for this medicine</p>
+                            <p className="reminder-dose-hint">Кількість для цього препарату не відстежується</p>
                         ) : (
                             <div className="reminder-dose-row">
                                 <input
@@ -174,7 +174,7 @@ export default function EditReminderPage() {
                                     type="number"
                                     min="0"
                                     step="any"
-                                    placeholder="e.g. 1"
+                                    placeholder="напр. 1"
                                     value={doseAmount}
                                     onChange={(e) => setDoseAmount(e.target.value)}
                                     disabled={isLoading}
@@ -191,7 +191,7 @@ export default function EditReminderPage() {
                 <div className="pill-form-row">
                     <div className="pill-form-field">
                         <label className="pill-form-label">
-                            Date <span className="pill-form-required">*</span>
+                            Дата <span className="pill-form-required">*</span>
                         </label>
                         <input
                             className={`pill-form-input${errors.date ? ' pill-form-input--invalid' : ''}`}
@@ -207,7 +207,7 @@ export default function EditReminderPage() {
                     </div>
                     <div className="pill-form-field">
                         <label className="pill-form-label">
-                            Time <span className="pill-form-required">*</span>
+                            Час <span className="pill-form-required">*</span>
                         </label>
                         <input
                             className={`pill-form-input${errors.time ? ' pill-form-input--invalid' : ''}`}
@@ -224,7 +224,7 @@ export default function EditReminderPage() {
 
                 {/* Recurrence */}
                 <div className="pill-form-field">
-                    <label className="pill-form-label">Repeat</label>
+                    <label className="pill-form-label">Повторення</label>
                     <select
                         className="pill-form-select"
                         value={recurrence}
@@ -244,7 +244,7 @@ export default function EditReminderPage() {
                 {isRecurring && (
                     <div className="pill-form-field">
                         <label className="pill-form-label">
-                            End date <span className="pill-form-optional">(optional)</span>
+                            Дата завершення <span className="pill-form-optional">(необов'язково)</span>
                         </label>
                         <input
                             className={`pill-form-input${errors.endDate ? ' pill-form-input--invalid' : ''}`}
@@ -262,10 +262,10 @@ export default function EditReminderPage() {
 
                 {/* Note */}
                 <div className="pill-form-field">
-                    <label className="pill-form-label">Note</label>
+                    <label className="pill-form-label">Нотатка</label>
                     <textarea
                         className="pill-form-textarea"
-                        placeholder="e.g., Take with food, Apply to affected area"
+                        placeholder="напр., Приймати з їжею, Нанести на уражену ділянку"
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
                         disabled={isLoading}
@@ -281,14 +281,14 @@ export default function EditReminderPage() {
                         onClick={handleSubmit}
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Saving…' : 'Save Changes'}
+                        {isLoading ? 'Збереження…' : 'Зберегти зміни'}
                     </button>
                     <button
                         className="pill-form-cancel-button"
                         onClick={() => navigate('/reminders')}
                         disabled={isLoading}
                     >
-                        Cancel
+                        Скасувати
                     </button>
                 </div>
             </div>

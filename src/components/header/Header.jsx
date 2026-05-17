@@ -71,7 +71,7 @@ export default function Header() {
                             ref={inputRef}
                             className="header-search-input"
                             type="text"
-                            placeholder="Search medicines…"
+                            placeholder="Пошук ліків…"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={handleKeyDown}
@@ -81,7 +81,7 @@ export default function Header() {
                             type="button"
                             className="header-search-close"
                             onClick={closeSearch}
-                            aria-label="Close search"
+                            aria-label="Закрити пошук"
                         >
                             <X size={16} />
                         </button>
@@ -102,8 +102,8 @@ export default function Header() {
                 </div>
             ) : (
                 <div className="auth-buttons">
-                    <button className="login"  onClick={() => navigate('/login')}>Login</button>
-                    <button className="signup" onClick={() => navigate('/signup')}>Sign Up</button>
+                    <button className="login"  onClick={() => navigate('/login')}>Увійти</button>
+                    <button className="signup" onClick={() => navigate('/signup')}>Реєстрація</button>
                 </div>
             )}
         </header>

@@ -17,11 +17,11 @@ export default function ForgotPasswordPage() {
 
     const handleSubmit = async () => {
         if (!email.trim()) {
-            setEmailError('Email is required');
+            setEmailError('Email обов\'язковий');
             return;
         }
         if (!EMAIL_REGEX.test(email.trim())) {
-            setEmailError('Enter a valid email address');
+            setEmailError('Введіть дійсну адресу email');
             return;
         }
         setEmailError('');
@@ -37,12 +37,12 @@ export default function ForgotPasswordPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setServerError(data.error || 'Something went wrong. Please try again.');
+                setServerError(data.error || 'Щось пішло не так. Спробуйте ще раз.');
             } else {
                 setSubmitted(true);
             }
         } catch {
-            setServerError('Network error. Please check your connection.');
+            setServerError('Помилка мережі. Перевірте з\'єднання.');
         } finally {
             setIsLoading(false);
         }
@@ -52,25 +52,25 @@ export default function ForgotPasswordPage() {
         return (
             <div className="auth-page">
                 <div className="auth-form-container">
-                    <h2 className="auth-form-title">Check your inbox</h2>
+                    <h2 className="auth-form-title">Перевірте пошту</h2>
                     <p className="forgot-password-hint">
-                        If <strong>{email}</strong> is registered, we've sent a password reset link.
-                        It expires in 24 hours.
+                        Якщо <strong>{email}</strong> зареєстровано, ми надіслали посилання для скидання пароля.
+                        Воно дійсне 24 години.
                     </p>
                     <p className="forgot-password-hint" style={{ marginTop: 8 }}>
-                        Didn't get it? Check your spam folder or try again.
+                        Не отримали? Перевірте папку спаму або спробуйте ще раз.
                     </p>
                     <div className="auth-input-field">
                         <button
                             className="auth-ghost-button"
                             onClick={() => { setSubmitted(false); setEmail(''); }}
                         >
-                            Try another email
+                            Спробувати інший email
                         </button>
                     </div>
                     <div className="auth-link-row">
                         <button className="auth-link-button" onClick={() => navigate('/login', { state: { email } })}>
-                            Back to Log In
+                            Назад до входу
                         </button>
                     </div>
                 </div>
@@ -81,9 +81,9 @@ export default function ForgotPasswordPage() {
     return (
         <div className="auth-page">
             <div className="auth-form-container">
-                <h2 className="auth-form-title">Forgot password?</h2>
+                <h2 className="auth-form-title">Забули пароль?</h2>
                 <p className="forgot-password-hint">
-                    Enter the email you signed up with and we'll send you a reset link.
+                    Введіть email, з яким ви реєструвались, і ми надішлемо посилання для скидання пароля.
                 </p>
 
                 <div className="auth-input-field">
@@ -108,13 +108,13 @@ export default function ForgotPasswordPage() {
                         onClick={handleSubmit}
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Sending…' : 'Send Reset Link'}
+                        {isLoading ? 'Надсилання…' : 'Надіслати посилання'}
                     </button>
                 </div>
 
                 <div className="auth-link-row">
                     <button className="auth-link-button" onClick={() => navigate('/login', { state: { email } })}>
-                        Back to Log In
+                        Назад до входу
                     </button>
                 </div>
             </div>

@@ -93,22 +93,22 @@ export default function PillPage() {
     const handlePhotoChange = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        if (!file.type.startsWith('image/')) { setPhotoError('Please select an image file'); return; }
-        if (file.size > 10 * 1024 * 1024)    { setPhotoError('Image must be smaller than 10 MB'); return; }
+        if (!file.type.startsWith('image/')) { setPhotoError('Будь ласка, виберіть файл зображення'); return; }
+        if (file.size > 10 * 1024 * 1024)    { setPhotoError('Зображення має бути менше 10 МБ'); return; }
         setPhotoError('');
         try {
             setPhoto(await resizeImage(file));
         } catch {
-            setPhotoError('Failed to process image. Please try another file.');
+            setPhotoError('Не вдалося обробити зображення. Спробуйте інший файл.');
         }
         e.target.value = '';
     };
 
     const validate = () => {
         const errs = {};
-        if (!form.name.trim()) errs.name = 'Medicine name is required';
+        if (!form.name.trim()) errs.name = 'Назва ліків обов\'язкова';
         if (form.quantity !== '' && (isNaN(Number(form.quantity)) || Number(form.quantity) < 0)) {
-            errs.quantity = 'Quantity must be a positive number';
+            errs.quantity = 'Кількість має бути позитивним числом';
         }
         return errs;
     };
@@ -150,7 +150,7 @@ export default function PillPage() {
                 }),
             });
             const data = await res.json();
-            if (!res.ok) { setServerError(data.error || 'Failed to save changes'); return; }
+            if (!res.ok) { setServerError(data.error || 'Помилка збереження змін'); return; }
             setMedicine(data);
             setForm(dataToForm(data));
             setPhoto(null);
@@ -158,13 +158,13 @@ export default function PillPage() {
             setSaveSuccess(true);
             setTimeout(() => setSaveSuccess(false), 3000);
         } catch {
-            setServerError('Network error. Please try again.');
+            setServerError('Помилка мережі. Спробуйте ще раз.');
         } finally {
             setIsSaving(false);
         }
     };
 
-    if (isLoading) return <div className="pill-page-loading">Loading…</div>;
+    if (isLoading) return <div className="pill-page-loading">Завантаження…</div>;
     if (!medicine || !form) return null;
 
     const quantityDisplay = medicine.quantity != null
@@ -177,7 +177,7 @@ export default function PillPage() {
     return (
         <div className="pill-page-container">
             <div className="pill-back-row">
-                <button className="pill-back-button" onClick={() => navigate('/kit')}>← Kit</button>
+                <button className="pill-back-button" onClick={() => navigate('/kit')}>← Аптечка</button>
             </div>
 
             {/* Photo */}
@@ -192,7 +192,7 @@ export default function PillPage() {
                                         type="button"
                                         className="pill-photo-remove"
                                         onClick={() => setPhoto(null)}
-                                        aria-label="Remove photo"
+                                        aria-label="Видалити фото"
                                     >
                                         <X size={15} />
                                     </button>
@@ -202,7 +202,7 @@ export default function PillPage() {
                                         onClick={() => fileInputRef.current?.click()}
                                         disabled={isSaving}
                                     >
-                                        Change photo
+                                        Змінити фото
                                     </button>
                                 </>
                             )}
@@ -215,7 +215,7 @@ export default function PillPage() {
                             disabled={isSaving}
                         >
                             <ImagePlus size={18} />
-                            Add photo
+                            Додати фото
                         </button>
                     ) : null}
 
@@ -238,7 +238,7 @@ export default function PillPage() {
                         value={form.name}
                         onChange={set('name')}
                         disabled={isSaving}
-                        placeholder="Medicine name"
+                        placeholder="Назва ліків"
                     />
                     {errors.name && <span className="pill-form-field-error">{errors.name}</span>}
                 </div>
@@ -247,20 +247,20 @@ export default function PillPage() {
             )}
 
             {/* Details */}
-            <h2 className="pill-section-title">Details</h2>
+            <h2 className="pill-section-title">Деталі</h2>
             <div className="pill-details-card">
                 {isEditing ? (
                     <>
                         <div className="pill-detail-row">
-                            <span className="pill-detail-label">Purpose</span>
-                            <input className="pill-detail-input" value={form.purpose} onChange={set('purpose')} placeholder="e.g., Pain relief" disabled={isSaving} />
+                            <span className="pill-detail-label">Призначення</span>
+                            <input className="pill-detail-input" value={form.purpose} onChange={set('purpose')} placeholder="напр., Знеболення" disabled={isSaving} />
                         </div>
                         <div className="pill-detail-row">
-                            <span className="pill-detail-label">Dosage</span>
-                            <input className="pill-detail-input" value={form.dosage} onChange={set('dosage')} placeholder="e.g., 500mg, 1 tablet" disabled={isSaving} />
+                            <span className="pill-detail-label">Дозування</span>
+                            <input className="pill-detail-input" value={form.dosage} onChange={set('dosage')} placeholder="напр., 500мг, 1 таблетка" disabled={isSaving} />
                         </div>
                         <div className="pill-detail-row pill-detail-row--quantity">
-                            <span className="pill-detail-label">Quantity</span>
+                            <span className="pill-detail-label">Кількість</span>
                             <div className="pill-quantity-inputs">
                                 <input
                                     className={`pill-detail-input pill-detail-input--short${errors.quantity ? ' pill-form-input--invalid' : ''}`}
@@ -278,53 +278,53 @@ export default function PillPage() {
                             {errors.quantity && <span className="pill-form-field-error">{errors.quantity}</span>}
                         </div>
                         <div className="pill-detail-row">
-                            <span className="pill-detail-label">Expiration</span>
+                            <span className="pill-detail-label">Термін придатності</span>
                             <input className="pill-detail-input" type="date" value={form.expiration_date} onChange={set('expiration_date')} disabled={isSaving} />
                         </div>
                     </>
                 ) : (
                     <>
-                        <DetailRow label="Purpose"    value={medicine.purpose} />
-                        <DetailRow label="Dosage"     value={medicine.dosage} />
-                        <DetailRow label="Quantity"   value={quantityDisplay} />
-                        <DetailRow label="Expiration" value={formatDate(medicine.expiration_date)} />
+                        <DetailRow label="Призначення"       value={medicine.purpose} />
+                        <DetailRow label="Дозування"         value={medicine.dosage} />
+                        <DetailRow label="Кількість"         value={quantityDisplay} />
+                        <DetailRow label="Термін придатності" value={formatDate(medicine.expiration_date)} />
                     </>
                 )}
             </div>
 
             {/* Instructions */}
-            <h2 className="pill-section-title">Instructions</h2>
+            <h2 className="pill-section-title">Інструкції</h2>
             {isEditing ? (
                 <textarea
                     className="pill-instructions-textarea"
                     value={form.instructions}
                     onChange={set('instructions')}
-                    placeholder="e.g., Take 1 tablet every 4–6 hours as needed."
+                    placeholder="напр., Приймати 1 таблетку кожні 4–6 годин за потреби."
                     rows={4}
                     disabled={isSaving}
                 />
             ) : (
                 <p className="pill-instructions-text">
-                    {medicine.instructions || 'No instructions provided.'}
+                    {medicine.instructions || 'Інструкції не вказані.'}
                 </p>
             )}
 
             {serverError && <div className="pill-server-error">{serverError}</div>}
-            {saveSuccess && <div className="pill-save-success">Changes saved successfully</div>}
+            {saveSuccess && <div className="pill-save-success">Зміни збережено</div>}
 
             {/* Actions */}
             <div className="pill-actions">
                 {isEditing ? (
                     <>
                         <button className="pill-save-button" onClick={handleSave} disabled={isSaving}>
-                            {isSaving ? 'Saving…' : 'Save'}
+                            {isSaving ? 'Збереження…' : 'Зберегти'}
                         </button>
                         <button className="pill-cancel-button" onClick={handleCancel} disabled={isSaving}>
-                            Cancel
+                            Скасувати
                         </button>
                     </>
                 ) : (
-                    <button className="pill-edit-button" onClick={handleEdit}>Edit</button>
+                    <button className="pill-edit-button" onClick={handleEdit}>Редагувати</button>
                 )}
             </div>
         </div>

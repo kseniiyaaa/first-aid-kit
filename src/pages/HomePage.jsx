@@ -92,10 +92,10 @@ function formatReminderTime(date) {
         hour12: false,
     });
 
-    if (date.toDateString() === now.toDateString())       return `Today, ${timeStr}`;
-    if (date.toDateString() === tomorrow.toDateString())  return `Tomorrow, ${timeStr}`;
+    if (date.toDateString() === now.toDateString())       return `Сьогодні, ${timeStr}`;
+    if (date.toDateString() === tomorrow.toDateString())  return `Завтра, ${timeStr}`;
     return (
-        date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + `, ${timeStr}`
+        date.toLocaleDateString('uk-UA', { month: 'short', day: 'numeric' }) + `, ${timeStr}`
     );
 }
 
@@ -162,7 +162,7 @@ export default function HomePage() {
         .map((m) => ({
             type: 'stock',
             name: m.name,
-            subtitle: `${m.quantity} ${m.unit || 'units'} remaining`,
+            subtitle: `${m.quantity} ${m.unit || 'одиниць'} залишилось`,
         }));
 
     const expiringSoonItems = medicines
@@ -177,7 +177,7 @@ export default function HomePage() {
     const activeReminderCount = reminders.filter((r) => {
         if (r.recurrence === 'none') return toDateStr(r.remind_at) >= todayStr;
         if (r.end_date)              return toDateStr(r.end_date)  >= todayStr;
-        return true; // повторюване без end_date — завжди активне
+        return true;
     }).length;
 
     // Today's occurrences (max 5)
@@ -190,65 +190,65 @@ export default function HomePage() {
         <div className="medikit-container">
             <main className="main-content">
                 <h1 className="page-title">
-                    {user?.fullName ? `${user.fullName}'s MediKit` : 'My MediKit'}
+                    {user?.fullName ? `MediKit ${user.fullName}` : 'Моя аптечка'}
                 </h1>
 
                 <section className="quick-actions">
-                    <h2 className="section-title">Quick Actions</h2>
+                    <h2 className="section-title">Швидкі дії</h2>
                     <div className="action-buttons">
                         <button
                             className="btn btn-primary btn-rounded"
                             onClick={() => navigate('/add')}
                         >
-                            Add Item
+                            Додати ліки
                         </button>
                         <button
                             className="btn btn-secondary btn-rounded"
                             onClick={() => navigate('/add/reminder')}
                         >
-                            Set Reminder
+                            Встановити нагадування
                         </button>
                         <button
                             className="btn btn-accent btn-rounded"
                             onClick={() => navigate('/log-intake')}
                         >
-                            Log Intake
+                            Зафіксувати прийом
                         </button>
                     </div>
                 </section>
 
                 <section className="kit-summary">
                     <div className="section-header">
-                        <h2 className="section-title">Kit Summary</h2>
+                        <h2 className="section-title">Звіт аптечки</h2>
                         <button className="btn btn-view-kit" onClick={() => navigate('/kit')}>
-                            View kit
+                            Переглянути аптечку
                         </button>
                     </div>
                     <div className="summary-cards">
                         <div className="summary-card">
-                            <div className="card-label">Total Items</div>
+                            <div className="card-label">Всього ліків</div>
                             <div className="card-value">{medicinesLoaded ? medicines.length : '…'}</div>
                         </div>
                         <div className="summary-card">
-                            <div className="card-label">Upcoming Reminders</div>
+                            <div className="card-label">Майбутні нагадування</div>
                             <div className="card-value">
                                 {remindersLoaded ? activeReminderCount : '…'}
                             </div>
                         </div>
                         <div className="summary-card">
-                            <div className="card-label">Low Stock</div>
+                            <div className="card-label">Низький запас</div>
                             <div className="card-value">{medicinesLoaded ? lowStockItems.length : '…'}</div>
                         </div>
                     </div>
                 </section>
 
                 <section className="upcoming-reminders">
-                    <h2 className="section-title">Upcoming Reminders</h2>
+                    <h2 className="section-title">Нагадування на сьогодні</h2>
                     <div className="reminder-list">
                         {!remindersLoaded ? (
-                            <p className="section-empty-state">Loading…</p>
+                            <p className="section-empty-state">Завантаження…</p>
                         ) : upcomingOccurrences.length === 0 ? (
-                            <p className="section-empty-state">No reminders for today.</p>
+                            <p className="section-empty-state">Сьогодні нагадувань немає.</p>
                         ) : (
                             upcomingOccurrences.map((r) => {
                                 const isDone = !!r.taken_today;
@@ -271,12 +271,12 @@ export default function HomePage() {
                 </section>
 
                 <section className="low-stock">
-                    <h2 className="section-title">Low Stock</h2>
+                    <h2 className="section-title">Низький запас</h2>
                     <div className="stock-list">
                         {!medicinesLoaded ? (
-                            <p className="section-empty-state">Loading…</p>
+                            <p className="section-empty-state">Завантаження…</p>
                         ) : lowStockItems.length === 0 ? (
-                            <p className="section-empty-state">No low stock medicines in your kit.</p>
+                            <p className="section-empty-state">Ліків з низьким запасом немає.</p>
                         ) : (
                             lowStockItems.map((item, i) => <ItemCard key={i} data={item} />)
                         )}
@@ -284,13 +284,13 @@ export default function HomePage() {
                 </section>
 
                 <section className="expiration-soon">
-                    <h2 className="section-title">Expiring Soon</h2>
+                    <h2 className="section-title">Спливає термін</h2>
                     <div className="expire-list">
                         {!medicinesLoaded ? (
-                            <p className="section-empty-state">Loading…</p>
+                            <p className="section-empty-state">Завантаження…</p>
                         ) : expiringSoonItems.length === 0 ? (
                             <p className="section-empty-state">
-                                No medicines expiring in the next 30 days.
+                                Ліків зі спливаючим терміном придатності протягом 30 днів немає.
                             </p>
                         ) : (
                             expiringSoonItems.map((item, i) => <ItemCard key={i} data={item} />)

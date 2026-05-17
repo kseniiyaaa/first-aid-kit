@@ -7,9 +7,9 @@ import '../styles/SearchResultsPage.css';
 const buildMeta = (m) => {
     const parts = [];
     if (m.dosage)           parts.push(m.dosage);
-    if (m.quantity != null) parts.push(`${m.quantity} ${m.unit || 'units'}`);
+    if (m.quantity != null) parts.push(`${m.quantity} ${m.unit || 'одиниць'}`);
     if (m.purpose)          parts.push(m.purpose);
-    return parts.join(' · ') || 'No details';
+    return parts.join(' · ') || 'Без деталей';
 };
 
 /** Highlights all occurrences of `term` inside `text` */
@@ -26,6 +26,12 @@ function Highlight({ text, term }) {
             )}
         </>
     );
+}
+
+function resultsCountLabel(n) {
+    if (n === 1) return `Знайдено ${n} результат`;
+    if (n >= 2 && n <= 4) return `Знайдено ${n} результати`;
+    return `Знайдено ${n} результатів`;
 }
 
 export default function SearchResultsPage() {
@@ -56,23 +62,23 @@ export default function SearchResultsPage() {
 
     return (
         <div className="search-page-container">
-            <button className="back-btn" onClick={() => navigate('/home')}>← Home</button>
+            <button className="back-btn" onClick={() => navigate('/home')}>← Головна</button>
             <h1 className="search-page-title">
-                Search results{query ? <> for <span className="search-page-query">"{query}"</span></> : ''}
+                Результати пошуку{query ? <> для <span className="search-page-query">"{query}"</span></> : ''}
             </h1>
 
             {isLoading ? (
-                <p className="search-page-empty">Loading…</p>
+                <p className="search-page-empty">Завантаження…</p>
             ) : !q ? (
-                <p className="search-page-empty">Enter a search term to find medicines.</p>
+                <p className="search-page-empty">Введіть запит для пошуку ліків.</p>
             ) : results.length === 0 ? (
                 <p className="search-page-empty">
-                    No medicines found matching <strong>"{query}"</strong>.
+                    Ліків за запитом <strong>"{query}"</strong> не знайдено.
                 </p>
             ) : (
                 <>
                     <p className="search-page-count">
-                        {results.length} result{results.length !== 1 ? 's' : ''} found
+                        {resultsCountLabel(results.length)}
                     </p>
                     <div className="search-results-list">
                         {results.map((medicine) => (

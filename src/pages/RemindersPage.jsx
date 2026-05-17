@@ -5,11 +5,11 @@ import { authFetch } from '../utils/api.js';
 import '../styles/RemindersPage.css';
 
 const RECURRENCE_LABELS = {
-    none:            'Does not repeat',
-    daily:           'Every day',
-    every_other_day: 'Every other day',
-    weekly:          'Every week',
-    monthly:         'Every month',
+    none:            'Не повторюється',
+    daily:           'Щодня',
+    every_other_day: 'Через день',
+    weekly:          'Щотижня',
+    monthly:         'Щомісяця',
 };
 
 /** Returns a YYYY-MM-DD string for the current local day */
@@ -58,7 +58,7 @@ function reminderMeta(r, isArchive) {
     }
 
     // Active recurring — label and time only
-    const endStr = r.end_date ? `  (until ${toDMY(r.end_date)})` : '';
+    const endStr = r.end_date ? `  (до ${toDMY(r.end_date)})` : '';
     return `${label} · ${time}${endStr}`;
 }
 
@@ -112,8 +112,8 @@ export default function RemindersPage() {
 
     return (
         <div className="reminders-page">
-            <button className="back-btn" onClick={() => navigate('/home')}>← Home</button>
-            <h1 className="reminders-title">Reminders</h1>
+            <button className="back-btn" onClick={() => navigate('/home')}>← Головна</button>
+            <h1 className="reminders-title">Нагадування</h1>
 
             {/* ── Tabs ── */}
             <div className="reminders-tabs">
@@ -121,13 +121,13 @@ export default function RemindersPage() {
                     className={`reminders-tab${tab === 'active' ? ' reminders-tab--active' : ''}`}
                     onClick={() => setTab('active')}
                 >
-                    Active
+                    Активні
                 </button>
                 <button
                     className={`reminders-tab${tab === 'archive' ? ' reminders-tab--active' : ''}`}
                     onClick={() => setTab('archive')}
                 >
-                    Archive
+                    Архів
                 </button>
             </div>
 
@@ -136,8 +136,8 @@ export default function RemindersPage() {
                 {list.length === 0 ? (
                     <p className="reminders-empty">
                         {tab === 'active'
-                            ? 'No active reminders. Tap "Set Reminder" on the home page to add one.'
-                            : 'No archived reminders yet.'}
+                            ? 'Немає активних нагадувань. Натисніть "Встановити нагадування" на головній сторінці.'
+                            : 'Архів порожній.'}
                     </p>
                 ) : (
                     list.map((r) => (
@@ -163,7 +163,7 @@ export default function RemindersPage() {
                                 {tab === 'active' && (
                                     <button
                                         className="reminders-action-btn"
-                                        title="Edit reminder"
+                                        title="Редагувати нагадування"
                                         onClick={() => navigate(`/reminders/${r.id}/edit`)}
                                     >
                                         <Pencil size={15} />
@@ -171,7 +171,7 @@ export default function RemindersPage() {
                                 )}
                                 <button
                                     className="reminders-action-btn reminders-action-btn--delete"
-                                    title="Delete reminder"
+                                    title="Видалити нагадування"
                                     onClick={() => setDeleteTarget(r)}
                                 >
                                     <Trash2 size={15} />
@@ -189,11 +189,10 @@ export default function RemindersPage() {
                     onClick={() => !isDeleting && setDeleteTarget(null)}
                 >
                     <div className="reminders-modal" onClick={(e) => e.stopPropagation()}>
-                        <h3>Delete reminder?</h3>
+                        <h3>Видалити нагадування?</h3>
                         <p>
-                            Are you sure you want to delete the reminder for{' '}
-                            <strong>{deleteTarget.medicine_name}</strong>? This action cannot be
-                            undone.
+                            Ви впевнені, що хочете видалити нагадування для{' '}
+                            <strong>{deleteTarget.medicine_name}</strong>? Цю дію не можна скасувати.
                         </p>
                         <div className="reminders-modal-actions">
                             <button
@@ -201,14 +200,14 @@ export default function RemindersPage() {
                                 onClick={handleDeleteConfirm}
                                 disabled={isDeleting}
                             >
-                                {isDeleting ? 'Deleting…' : 'Yes, delete'}
+                                {isDeleting ? 'Видалення…' : 'Так, видалити'}
                             </button>
                             <button
                                 className="reminders-modal-cancel"
                                 onClick={() => setDeleteTarget(null)}
                                 disabled={isDeleting}
                             >
-                                Cancel
+                                Скасувати
                             </button>
                         </div>
                     </div>

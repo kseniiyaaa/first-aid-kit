@@ -25,7 +25,7 @@ export default function ResetPasswordPage() {
     useEffect(() => {
         if (!token) {
             setTokenStatus('invalid');
-            setTokenError('Invalid reset link — no token found.');
+            setTokenError('Недійсне посилання для скидання — токен не знайдено.');
             return;
         }
 
@@ -46,7 +46,7 @@ export default function ResetPasswordPage() {
             .catch((err) => {
                 if (err.name === 'AbortError') return;
                 setTokenStatus('invalid');
-                setTokenError('Network error. Please try again.');
+                setTokenError('Помилка мережі. Спробуйте ще раз.');
             });
 
         return () => controller.abort();
@@ -56,14 +56,14 @@ export default function ResetPasswordPage() {
     const validate = () => {
         const errs = {};
         if (!newPassword) {
-            errs.newPassword = 'New password is required';
+            errs.newPassword = 'Новий пароль обов\'язковий';
         } else if (newPassword.length < 8) {
-            errs.newPassword = 'Password must be at least 8 characters';
+            errs.newPassword = 'Пароль має містити щонайменше 8 символів';
         }
         if (!confirmPassword) {
-            errs.confirmPassword = 'Please confirm your password';
+            errs.confirmPassword = 'Підтвердіть пароль';
         } else if (newPassword !== confirmPassword) {
-            errs.confirmPassword = 'Passwords do not match';
+            errs.confirmPassword = 'Паролі не збігаються';
         }
         return errs;
     };
@@ -84,13 +84,13 @@ export default function ResetPasswordPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setServerError(data.error || 'Something went wrong. Please try again.');
+                setServerError(data.error || 'Щось пішло не так. Спробуйте ще раз.');
             } else {
                 // Navigate to login with a success flag
                 navigate('/login?passwordReset=1');
             }
         } catch {
-            setServerError('Network error. Please check your connection.');
+            setServerError('Помилка мережі. Перевірте з\'єднання.');
         } finally {
             setIsLoading(false);
         }
@@ -102,7 +102,7 @@ export default function ResetPasswordPage() {
             <div className="auth-page">
                 <div className="auth-form-container">
                     <p style={{ textAlign: 'center', color: '#4F8796', padding: '32px 0' }}>
-                        Validating link…
+                        Перевірка посилання…
                     </p>
                 </div>
             </div>
@@ -114,19 +114,19 @@ export default function ResetPasswordPage() {
         return (
             <div className="auth-page">
                 <div className="auth-form-container">
-                    <h2 className="auth-form-title">Link expired</h2>
+                    <h2 className="auth-form-title">Посилання застаріло</h2>
                     <p className="forgot-password-hint">{tokenError}</p>
                     <div className="auth-input-field">
                         <button
                             className="auth-submit-button"
                             onClick={() => navigate('/forgot-password')}
                         >
-                            Request a new link
+                            Запросити нове посилання
                         </button>
                     </div>
                     <div className="auth-link-row">
                         <button className="auth-link-button" onClick={() => navigate('/login')}>
-                            Back to Log In
+                            Назад до входу
                         </button>
                     </div>
                 </div>
@@ -138,9 +138,9 @@ export default function ResetPasswordPage() {
     return (
         <div className="auth-page">
             <div className="auth-form-container">
-                <h2 className="auth-form-title">Set new password</h2>
+                <h2 className="auth-form-title">Встановити новий пароль</h2>
                 <p className="forgot-password-hint">
-                    Choose a strong password with at least 8 characters.
+                    Оберіть надійний пароль щонайменше з 8 символів.
                 </p>
 
                 <div className="auth-input-field">
@@ -148,7 +148,7 @@ export default function ResetPasswordPage() {
                         <input
                             className={`auth-input${errors.newPassword ? ' auth-input--invalid' : ''}`}
                             type={showNew ? 'text' : 'password'}
-                            placeholder="New password"
+                            placeholder="Новий пароль"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             disabled={isLoading}
@@ -173,7 +173,7 @@ export default function ResetPasswordPage() {
                         <input
                             className={`auth-input${errors.confirmPassword ? ' auth-input--invalid' : ''}`}
                             type={showConfirm ? 'text' : 'password'}
-                            placeholder="Confirm new password"
+                            placeholder="Підтвердіть новий пароль"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleReset()}
@@ -201,7 +201,7 @@ export default function ResetPasswordPage() {
                         onClick={handleReset}
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Saving…' : 'Reset Password'}
+                        {isLoading ? 'Збереження…' : 'Скинути пароль'}
                     </button>
                 </div>
             </div>

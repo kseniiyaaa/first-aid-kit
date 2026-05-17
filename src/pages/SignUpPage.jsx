@@ -23,24 +23,24 @@ export default function SignUpPage() {
     const validate = () => {
         const newErrors = {};
         if (!fullName.trim()) {
-            newErrors.fullName = 'Full name is required';
+            newErrors.fullName = 'Ім\'я обов\'язкове';
         } else if (fullName.trim().length < 2) {
-            newErrors.fullName = 'Name must be at least 2 characters';
+            newErrors.fullName = 'Ім\'я має містити щонайменше 2 символи';
         }
         if (!email.trim()) {
-            newErrors.email = 'Email is required';
+            newErrors.email = 'Email обов\'язковий';
         } else if (!EMAIL_REGEX.test(email)) {
-            newErrors.email = 'Enter a valid email address';
+            newErrors.email = 'Введіть дійсну адресу email';
         }
         if (!password) {
-            newErrors.password = 'Password is required';
+            newErrors.password = 'Пароль обов\'язковий';
         } else if (password.length < 8) {
-            newErrors.password = 'Password must be at least 8 characters';
+            newErrors.password = 'Пароль має містити щонайменше 8 символів';
         }
         if (!confirmPassword) {
-            newErrors.confirmPassword = 'Please confirm your password';
+            newErrors.confirmPassword = 'Підтвердіть пароль';
         } else if (password !== confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match';
+            newErrors.confirmPassword = 'Паролі не збігаються';
         }
         return newErrors;
     };
@@ -70,14 +70,14 @@ export default function SignUpPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setServerError(data.error || 'Registration failed. Please try again.');
+                setServerError(data.error || 'Помилка реєстрації. Спробуйте ще раз.');
                 return;
             }
 
             login(data.token, data.user);
             navigate('/home');
         } catch {
-            setServerError('Network error. Please check your connection.');
+            setServerError('Помилка мережі. Перевірте з\'єднання.');
         } finally {
             setIsLoading(false);
         }
@@ -86,13 +86,13 @@ export default function SignUpPage() {
     return (
         <div className="auth-page">
             <div className="auth-form-container">
-                <h2 className="auth-form-title">Create your account</h2>
+                <h2 className="auth-form-title">Створити акаунт</h2>
 
                 <div className="auth-input-field">
                     <input
                         className={`auth-input${errors.fullName ? ' auth-input--invalid' : ''}`}
                         type="text"
-                        placeholder="Full Name"
+                        placeholder="Повне ім'я"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         disabled={isLoading}
@@ -117,7 +117,7 @@ export default function SignUpPage() {
                         <input
                             className={`auth-input${errors.password ? ' auth-input--invalid' : ''}`}
                             type={showPassword ? 'text' : 'password'}
-                            placeholder="Password"
+                            placeholder="Пароль"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             disabled={isLoading}
@@ -139,7 +139,7 @@ export default function SignUpPage() {
                         <input
                             className={`auth-input${errors.confirmPassword ? ' auth-input--invalid' : ''}`}
                             type={showConfirmPassword ? 'text' : 'password'}
-                            placeholder="Confirm Password"
+                            placeholder="Підтвердіть пароль"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             disabled={isLoading}
@@ -166,18 +166,18 @@ export default function SignUpPage() {
                         onClick={handleSignUp}
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Creating account…' : 'Sign Up'}
+                        {isLoading ? 'Створення акаунту…' : 'Зареєструватись'}
                     </button>
                 </div>
 
                 <div className="auth-link-row">
-                    Already have an account?{' '}
+                    Вже є акаунт?{' '}
                     <button
                         className="auth-link-button"
                         onClick={() => navigate('/login')}
                         disabled={isLoading}
                     >
-                        Log In
+                        Увійти
                     </button>
                 </div>
             </div>

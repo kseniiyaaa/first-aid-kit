@@ -15,7 +15,7 @@ async function searchDrugs(query) {
 async function enrichDrug(name) {
     const res = await authFetch(`/api/drug-search/enrich?name=${encodeURIComponent(name)}`);
     if (!res.ok) throw new Error('Enrich unavailable');
-    return res.json(); // { purpose, instructions, unit, photoUrl }
+    return res.json(); // { purpose, instructions, unit }
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -38,9 +38,9 @@ export default function AddDecisionPage() {
         try {
             const found = await searchDrugs(query);
             setResults(found);
-            if (found.length === 0) setSearchError(`No results for "${query}"`);
+            if (found.length === 0) setSearchError(`Нічого не знайдено для "${query}"`);
         } catch {
-            setSearchError('Search unavailable. You can still add medicine manually.');
+            setSearchError('Пошук недоступний. Ви можете додати ліки вручну.');
             setResults([]);
         } finally {
             setIsSearching(false);
@@ -71,8 +71,8 @@ export default function AddDecisionPage() {
 
     return (
         <div className="add-decision-container">
-            <button className="back-btn" onClick={() => navigate('/home')}>← Home</button>
-            <h1 className="add-decision-title">Add to Your Kit</h1>
+            <button className="back-btn" onClick={() => navigate('/home')}>← Головна</button>
+            <h1 className="add-decision-title">Додати до аптечки</h1>
 
             <div className="add-decision-search-row">
                 <div className="add-decision-search-wrapper">
@@ -80,7 +80,7 @@ export default function AddDecisionPage() {
                     <input
                         className="add-decision-search-input"
                         type="text"
-                        placeholder="Search medicines…"
+                        placeholder="Пошук ліків…"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         autoFocus
@@ -93,7 +93,7 @@ export default function AddDecisionPage() {
             {isSearching && (
                 <div className="catalog-searching">
                     <Loader size={16} className="catalog-spinner" />
-                    Searching…
+                    Пошук…
                 </div>
             )}
 
@@ -105,7 +105,7 @@ export default function AddDecisionPage() {
             {/* Initial hint */}
             {!isSearching && !searchError && results.length === 0 && (
                 <div className="catalog-empty-state catalog-empty-state--hint">
-                    Type at least 3 characters to search any medicine by name
+                    Введіть щонайменше 3 символи для пошуку ліків
                 </div>
             )}
 
@@ -129,7 +129,7 @@ export default function AddDecisionPage() {
                                     ? <Loader size={14} className="catalog-spinner" />
                                     : <Plus size={14} />
                                 }
-                                {loadingItem === name ? 'Loading…' : 'Add'}
+                                {loadingItem === name ? 'Завантаження…' : 'Додати'}
                             </button>
                         </div>
                     ))}
@@ -137,13 +137,13 @@ export default function AddDecisionPage() {
             )}
 
             <div className="add-manual-row">
-                <span className="add-manual-text">Can't find your medicine?</span>
+                <span className="add-manual-text">Не знайшли потрібних ліків?</span>
                 <button
                     className="add-manual-button"
                     onClick={() => navigate('/add/manual')}
                     disabled={anyLoading}
                 >
-                    Add manually
+                    Додати вручну
                 </button>
             </div>
         </div>
