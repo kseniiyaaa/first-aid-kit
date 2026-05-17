@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Pill, Plus, Trash2 } from 'lucide-react';
 import { authFetch } from '../utils/api.js';
+import { displayUnit } from '../utils/units.js';
 import '../styles/KitPage.css';
 
 const buildMeta = (m) => {
     const parts = [];
     if (m.dosage)            parts.push(m.dosage);
-    if (m.quantity != null)  parts.push(`${m.quantity} ${m.unit || 'одиниць'}`);
+    if (m.quantity != null)  parts.push(`${m.quantity} ${displayUnit(m.unit)}`);
     if (m.purpose)           parts.push(m.purpose);
     return parts.join(' · ') || 'Без деталей';
 };

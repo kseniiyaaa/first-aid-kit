@@ -2,9 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ImagePlus, X } from 'lucide-react';
 import { authFetch } from '../utils/api.js';
+import { UNITS, displayUnit } from '../utils/units.js';
 import '../styles/PillPage.css';
-
-const UNITS = ['tablets', 'capsules', 'ml', 'mg', 'g', 'drops', 'patches', 'tubes', 'ampoules'];
 
 const formatDate = (dateStr) => {
     if (!dateStr) return null;
@@ -64,7 +63,7 @@ export default function PillPage() {
 
     const [medicine,    setMedicine]    = useState(null);
     const [form,        setForm]        = useState(null);
-    const [photo,       setPhoto]       = useState(null); // base64 or null (edit state)
+    const [photo,       setPhoto]       = useState(null);
     const [photoError,  setPhotoError]  = useState('');
     const [isEditing,   setIsEditing]   = useState(false);
     const [isLoading,   setIsLoading]   = useState(true);
@@ -168,10 +167,9 @@ export default function PillPage() {
     if (!medicine || !form) return null;
 
     const quantityDisplay = medicine.quantity != null
-        ? `${medicine.quantity} ${medicine.unit || ''}`.trim()
+        ? `${medicine.quantity} ${displayUnit(medicine.unit)}`.trim()
         : null;
 
-    // In edit mode: `photo` state holds the new value (may equal medicine.photo or be changed/null)
     const editPhoto = isEditing ? photo : medicine.photo;
 
     return (
@@ -272,7 +270,9 @@ export default function PillPage() {
                                     disabled={isSaving}
                                 />
                                 <select className="pill-detail-select" value={form.unit} onChange={set('unit')} disabled={isSaving}>
-                                    {UNITS.map((u) => <option key={u} value={u}>{u}</option>)}
+                                    {UNITS.map((u) => (
+                                        <option key={u.value} value={u.value}>{u.label}</option>
+                                    ))}
                                 </select>
                             </div>
                             {errors.quantity && <span className="pill-form-field-error">{errors.quantity}</span>}
@@ -284,9 +284,9 @@ export default function PillPage() {
                     </>
                 ) : (
                     <>
-                        <DetailRow label="Призначення"       value={medicine.purpose} />
-                        <DetailRow label="Дозування"         value={medicine.dosage} />
-                        <DetailRow label="Кількість"         value={quantityDisplay} />
+                        <DetailRow label="Призначення"        value={medicine.purpose} />
+                        <DetailRow label="Дозування"          value={medicine.dosage} />
+                        <DetailRow label="Кількість"          value={quantityDisplay} />
                         <DetailRow label="Термін придатності" value={formatDate(medicine.expiration_date)} />
                     </>
                 )}

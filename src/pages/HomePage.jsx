@@ -4,6 +4,7 @@ import '../styles/HomePage.css';
 import ItemCard from '../components/item-card/ItemCard.jsx';
 import { useAuth } from '../context/AuthProvider.jsx';
 import { authFetch } from '../utils/api.js';
+import { displayUnit } from '../utils/units.js';
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -162,7 +163,7 @@ export default function HomePage() {
         .map((m) => ({
             type: 'stock',
             name: m.name,
-            subtitle: `${m.quantity} ${m.unit || 'одиниць'} залишилось`,
+            subtitle: `${m.quantity} ${displayUnit(m.unit)} залишилось`,
         }));
 
     const expiringSoonItems = medicines

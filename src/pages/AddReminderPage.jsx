@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authFetch } from '../utils/api.js';
+import { displayUnit } from '../utils/units.js';
 import '../styles/AddPillPage.css';
 
 const RECURRENCE_OPTIONS = [
@@ -128,7 +129,7 @@ export default function AddReminderPage() {
                                     disabled={isLoading}
                                 />
                                 {selectedMedicine.unit && (
-                                    <span className="reminder-dose-unit">{selectedMedicine.unit}</span>
+                                    <span className="reminder-dose-unit">{displayUnit(selectedMedicine.unit)}</span>
                                 )}
                             </div>
                         )}

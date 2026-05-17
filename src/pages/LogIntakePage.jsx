@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, X, CheckCircle } from 'lucide-react';
 import { authFetch } from '../utils/api.js';
+import { displayUnit } from '../utils/units.js';
 import '../styles/LogIntakePage.css';
 
 let nextUid = 1;
@@ -102,7 +103,7 @@ export default function LogIntakePage() {
                             <li key={m.id} className="log-intake-success-item">
                                 <span className="log-intake-success-name">{m.name}</span>
                                 <span className="log-intake-success-detail">
-                                    −{m.deducted} {m.unit || 'одиниць'} &nbsp;·&nbsp; {m.quantity} {m.unit || 'одиниць'} залишилось
+                                    −{m.deducted} {displayUnit(m.unit)} &nbsp;·&nbsp; {m.quantity} {displayUnit(m.unit)} залишилось
                                 </span>
                             </li>
                         ))}
@@ -166,7 +167,7 @@ export default function LogIntakePage() {
                                     <option value="">— Оберіть ліки —</option>
                                     {available.map((m) => (
                                         <option key={m.id} value={String(m.id)}>
-                                            {m.name}{m.quantity != null ? ` (${m.quantity} ${m.unit || 'одиниць'} в наявності)` : ''}
+                                            {m.name}{m.quantity != null ? ` (${m.quantity} ${displayUnit(m.unit)} в наявності)` : ''}
                                         </option>
                                     ))}
                                 </select>

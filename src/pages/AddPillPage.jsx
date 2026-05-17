@@ -2,9 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ImagePlus, X } from 'lucide-react';
 import { authFetch } from '../utils/api.js';
+import { UNITS } from '../utils/units.js';
 import '../styles/AddPillPage.css';
-
-const UNITS = ['tablets', 'capsules', 'ml', 'mg', 'g', 'drops', 'patches', 'tubes', 'ampoules'];
 
 /** Resizes an image File to at most maxPx on its longest side, returns a base64 JPEG string */
 function resizeImage(file, maxPx = 900) {
@@ -46,7 +45,7 @@ export default function AddPillPage() {
         expiration_date: '',
         instructions:    '',
     });
-    const [photo,        setPhoto]        = useState(null); // base64 data URL
+    const [photo,        setPhoto]        = useState(null);
     const [photoError,   setPhotoError]   = useState('');
     const [errors,       setErrors]       = useState({});
     const [serverError,  setServerError]  = useState('');
@@ -93,7 +92,6 @@ export default function AddPillPage() {
         } catch {
             setPhotoError('Не вдалося обробити зображення. Спробуйте інший файл.');
         }
-        // Reset input so the same file can be re-selected after removal
         e.target.value = '';
     };
 
@@ -248,7 +246,9 @@ export default function AddPillPage() {
                             onChange={set('unit')}
                             disabled={isLoading}
                         >
-                            {UNITS.map((u) => <option key={u} value={u}>{u}</option>)}
+                            {UNITS.map((u) => (
+                                <option key={u.value} value={u.value}>{u.label}</option>
+                            ))}
                         </select>
                     </div>
                 </div>
