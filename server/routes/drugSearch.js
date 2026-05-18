@@ -242,8 +242,53 @@ async function fetchCategoryNames() {
     return names;
 }
 
+// ── Level-2 categories only (broad groups) — used for filter chips ────────────
+function extractLevel2Categories(topCats) {
+    const result = [];
+    for (const top of (topCats || [])) {
+        if (!MEDICAL_ROOT_IDS.has(top.id)) continue;
+        for (const sub of (top.subcategories || [])) {
+            if (sub.id && sub.name) result.push({ id: sub.id, name: sub.name });
+        }
+    }
+    return result.sort((a, b) => a.name.localeCompare(b.name, 'uk'));
+}
+
+async function fetchFilterCategories() {
+    const cached = getCached('anc:filter-categories');
+    if (cached) return cached;
+    const data = await httpsGetJSON('https://anc.ua/productbrowser/v2/ua/categories');
+    const cats = extractLevel2Categories(data?.categories || []);
+    setCached('anc:filter-categories', cats, 60 * 60 * 1000); // cache 1 hour
+    return cats;
+}
+
 // ── Cities to query in parallel (different regions = different stock = more unique results) ──
-const SEARCH_CITIES = [5, 1, 2, 7, 10, 14, 17, 22];
+const SEARCH_CITIES          = [5, 1, 2, 7, 10, 14, 17, 22]; // for free-text search
+const CATEGORY_SEARCH_CITIES = [5, 1, 2];                     // 3 cities is enough per term
+
+// ── Curated category → search-term mapping ─────────────────────────────────
+// Using specific medicine/brand names ensures ANC text search reliably finds
+// relevant products (generic category words like "знеболюючі" often return 0).
+const CATEGORY_SEARCHES = {
+    cold:        ['терафлю', 'антигрипін', 'фервекс', 'риніколд'],
+    cough:       ['амброксол', 'лазолван', 'мукалтин', 'бромгексин'],
+    pain:        ['ібупрофен', 'кетопрофен', 'диклофенак', 'кетанов'],
+    fever:       ['парацетамол', 'нурофен', 'аспірин', 'панадол'],
+    allergy:     ['лоратадін', 'цетиризин', 'супрастин', 'еріус'],
+    vitamins:    ['вітамін c', 'вітамін d3', 'мультивітамін', 'магній b6'],
+    heart:       ['аспірин кардіо', 'корвалол', 'валідол', 'тріампур'],
+    pressure:    ['еналаприл', 'лозартан', 'бісопролол', 'амлодипін'],
+    stomach:     ['омепразол', 'маалокс', 'мотиліум', 'панкреатин'],
+    diarrhea:    ['ентерос-гель', 'смекта', 'лоперамід', 'активоване вугілля'],
+    antibiotics: ['амоксицилін', 'азитроміцин', 'цефтріаксон', 'офлоксацин'],
+    sedative:    ['валеріана', 'персен', 'ново-пасит', 'гліцин'],
+    nose:        ['ксилометазолін', 'аквамаріс', 'називін', 'отривін'],
+    throat:      ['стрепсілс', 'фалімінт', 'нео-ангін', 'люголь'],
+    eye:         ['візин', 'тауфон', 'систейн', 'офтагель'],
+    antiseptic:  ['хлоргексидин', 'мірамістин', 'йод', 'перекис водню'],
+    diabetes:    ['метформін', 'глюкофаж', 'тест-смужки глюкометр', 'ланцети'],
+};
 
 async function searchCity(q, city) {
     try {
@@ -258,9 +303,50 @@ async function searchCity(q, city) {
     }
 }
 
-// ── GET /api/drug-search/search?q=... ─────────────────────────────────────────
+// Deduplicate a flat array of raw ANC product objects by id/name
+function deduplicateProducts(allItems, limit = 30) {
+    const seen   = new Set();
+    const merged = [];
+    for (const item of allItems) {
+        const key = item.id ?? item.name ?? item.productName ?? item.title;
+        if (key && seen.has(String(key))) continue;
+        if (key) seen.add(String(key));
+        merged.push(item);
+        if (merged.length >= limit) break;
+    }
+    return merged;
+}
+
+// ── GET /api/drug-search/search?q=...  OR  ?category=... ─────────────────────
 router.get('/search', requireAuth, async (req, res) => {
-    const q = (req.query.q || '').trim();
+    const q        = (req.query.q || '').trim();
+    const category = (req.query.category || '').trim();
+
+    // ── Category browse mode ──────────────────────────────────────────────────
+    if (category && CATEGORY_SEARCHES[category]) {
+        const cacheKey = `anc:cat:${category}`;
+        const cached   = getCached(cacheKey);
+        if (cached) return res.json(cached);
+
+        try {
+            const terms = CATEGORY_SEARCHES[category];
+            // All (term × city) combinations in one parallel batch
+            const calls   = terms.flatMap(term =>
+                CATEGORY_SEARCH_CITIES.map(city => searchCity(term, city))
+            );
+            const buckets = await Promise.all(calls);
+            const merged  = deduplicateProducts(buckets.flat(), 30);
+            const results = merged.map(normalizeProduct).filter(p => p.name.length > 0);
+
+            setCached(cacheKey, results, 10 * 60 * 1000); // 10 min
+            return res.json(results);
+        } catch (err) {
+            console.error('ANC category search error:', err.message);
+            return res.json([]);
+        }
+    }
+
+    // ── Text search mode ──────────────────────────────────────────────────────
     if (q.length < 3) return res.json([]);
 
     const cacheKey = `anc:search:${q.toLowerCase()}`;
@@ -270,24 +356,9 @@ router.get('/search', requireAuth, async (req, res) => {
     try {
         // Query all cities in parallel; ANC hard-limits to 5 per city but different
         // cities return different products, so we aggregate for more unique results
-        const cityResults = await Promise.all(SEARCH_CITIES.map(city => searchCity(q, city)));
-
-        const seen    = new Set();
-        const merged  = [];
-        for (const items of cityResults) {
-            for (const item of items) {
-                const key = item.id ?? item.name ?? item.productName ?? item.title;
-                if (key && seen.has(String(key))) continue;
-                if (key) seen.add(String(key));
-                merged.push(item);
-                if (merged.length >= 20) break;
-            }
-            if (merged.length >= 20) break;
-        }
-
-        const results = merged
-            .map(normalizeProduct)
-            .filter(p => p.name.length > 0);
+        const buckets = await Promise.all(SEARCH_CITIES.map(city => searchCity(q, city)));
+        const merged  = deduplicateProducts(buckets.flat(), 20);
+        const results = merged.map(normalizeProduct).filter(p => p.name.length > 0);
 
         setCached(cacheKey, results, 3 * 60 * 1000); // 3 min
         res.json(results);
@@ -304,6 +375,18 @@ router.get('/categories', requireAuth, async (req, res) => {
         res.json(names);
     } catch (err) {
         console.error('ANC categories error:', err.message);
+        res.json([]);
+    }
+});
+
+// ── GET /api/drug-search/filter-categories ────────────────────────────────────
+// Returns broad level-2 medical categories as [{id, name}] for filter chips UI
+router.get('/filter-categories', requireAuth, async (req, res) => {
+    try {
+        const cats = await fetchFilterCategories();
+        res.json(cats);
+    } catch (err) {
+        console.error('ANC filter-categories error:', err.message);
         res.json([]);
     }
 });
