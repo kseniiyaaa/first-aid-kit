@@ -1,40 +1,45 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Pill, Plus, Loader } from 'lucide-react';
+import { Search, Pill, Plus, Loader, X, ChevronDown } from 'lucide-react';
 import { authFetch } from '../utils/api.js';
 import '../styles/AddDecisionPage.css';
 
-// ── API calls (proxied through backend to avoid CORS) ─────────────────────────
+// ── Popular medicine suggestions ─────────────────────────────────────────────
+const POPULAR = [
+    'Нурофєн',       'Парацетамол',    'Аспірин',       'Но-шпа',
+    'Ібупрофен',     'Лоратадін',      'Супрастин',     'Омепразол',
+    'Амброксол',     'Лазолван',       'Цитрамон',      'Корвалол',
+    'Валеріана',     'Активоване вугілля', 'Ентерос-гель', 'Смекта',
+    'Хлоргексидин',  'Мукалтин',       'Бісептол',      'Магній B6',
+];
 
+const PAGE_SIZE = 5; // results per page
+
+// ── API helper ────────────────────────────────────────────────────────────────
 async function searchDrugs(query) {
     const res = await authFetch(`/api/drug-search/search?q=${encodeURIComponent(query)}`);
     if (!res.ok) throw new Error('Search unavailable');
-    return res.json(); // string[]
-}
-
-async function enrichDrug(name) {
-    const res = await authFetch(`/api/drug-search/enrich?name=${encodeURIComponent(name)}`);
-    if (!res.ok) throw new Error('Enrich unavailable');
-    return res.json(); // { purpose, instructions, unit }
+    return res.json();
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-
 export default function AddDecisionPage() {
     const navigate = useNavigate();
 
     const [search,      setSearch]      = useState('');
-    const [results,     setResults]     = useState([]); // string[]
+    const [results,     setResults]     = useState([]);
+    const [visibleCount,setVisibleCount]= useState(PAGE_SIZE);
     const [isSearching, setIsSearching] = useState(false);
     const [searchError, setSearchError] = useState('');
-    const [loadingItem, setLoadingItem] = useState(null); // name of item being enriched
+    const [loadingId,   setLoadingId]   = useState(null);
 
     const debounceRef = useRef(null);
-    const anyLoading  = loadingItem !== null;
+    const anyLoading  = loadingId !== null;
 
     const doSearch = useCallback(async (query) => {
         setIsSearching(true);
         setSearchError('');
+        setVisibleCount(PAGE_SIZE); // reset pagination on new search
         try {
             const found = await searchDrugs(query);
             setResults(found);
@@ -50,30 +55,51 @@ export default function AddDecisionPage() {
     useEffect(() => {
         clearTimeout(debounceRef.current);
         if (search.trim().length < 3) { setResults([]); setSearchError(''); return; }
-        debounceRef.current = setTimeout(() => doSearch(search), 400);
+        debounceRef.current = setTimeout(() => doSearch(search.trim()), 400);
         return () => clearTimeout(debounceRef.current);
     }, [search, doSearch]);
 
-    const handleCatalogAdd = async (name) => {
-        setLoadingItem(name);
-
-        let prefillData;
-        try {
-            const enriched = await enrichDrug(name);
-            prefillData = { name, ...enriched };
-        } catch {
-            prefillData = { name, purpose: '', instructions: '', unit: null };
-        }
-
-        sessionStorage.setItem('medikit_add_prefill', JSON.stringify(prefillData));
+    const handleCatalogAdd = (product) => {
+        const itemKey = product.id ?? product.name;
+        setLoadingId(itemKey);
+        sessionStorage.setItem('medikit_add_prefill', JSON.stringify({
+            name:              product.name,
+            dosage:            product.dosage  || '',
+            purpose:           product.purpose || '',
+            unit:              product.unit    || null,
+            picture:           product.picture || null,
+            apiDescriptionUrl: product.apiDescriptionUrl || null,
+        }));
         navigate('/add/manual?prefill=1');
     };
+
+    const clearSearch = () => {
+        setSearch('');
+        setResults([]);
+        setSearchError('');
+        setVisibleCount(PAGE_SIZE);
+    };
+
+    const showHint    = !isSearching && !searchError && results.length === 0 && search.trim().length < 3;
+    const showResults = !isSearching && results.length > 0;
+    const showError   = !isSearching && !!searchError;
+
+    const visibleResults  = results.slice(0, visibleCount);
+    const hiddenCount     = results.length - visibleCount;
 
     return (
         <div className="add-decision-container">
             <button className="back-btn" onClick={() => navigate('/home')}>← Головна</button>
             <h1 className="add-decision-title">Додати до аптечки</h1>
 
+            {/* Hint — above search bar */}
+            {showHint && (
+                <p className="catalog-hint-above">
+                    Введіть щонайменше 3 символи для пошуку ліків
+                </p>
+            )}
+
+            {/* Search bar */}
             <div className="add-decision-search-row">
                 <div className="add-decision-search-wrapper">
                     <Search className="add-decision-search-icon" size={18} />
@@ -86,8 +112,38 @@ export default function AddDecisionPage() {
                         autoFocus
                         disabled={anyLoading}
                     />
+                    {search && (
+                        <button
+                            className="add-decision-search-clear"
+                            type="button"
+                            onClick={clearSearch}
+                            aria-label="Очистити пошук"
+                            disabled={anyLoading}
+                        >
+                            <X size={16} />
+                        </button>
+                    )}
                 </div>
             </div>
+
+            {/* Popular suggestions */}
+            {showHint && (
+                <div className="catalog-popular">
+                    <p className="catalog-popular-label">Популярні препарати:</p>
+                    <div className="catalog-popular-chips">
+                        {POPULAR.map((term) => (
+                            <button
+                                key={term}
+                                className="catalog-popular-chip"
+                                onClick={() => setSearch(term)}
+                                disabled={anyLoading}
+                            >
+                                {term}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Searching indicator */}
             {isSearching && (
@@ -98,42 +154,77 @@ export default function AddDecisionPage() {
             )}
 
             {/* Error / no results */}
-            {!isSearching && searchError && (
+            {showError && (
                 <div className="catalog-empty-state">{searchError}</div>
             )}
 
-            {/* Initial hint */}
-            {!isSearching && !searchError && results.length === 0 && (
-                <div className="catalog-empty-state catalog-empty-state--hint">
-                    Введіть щонайменше 3 символи для пошуку ліків
-                </div>
-            )}
-
             {/* Results list */}
-            {!isSearching && results.length > 0 && (
-                <div className="catalog-list">
-                    {results.map((name) => (
-                        <div className="catalog-item" key={name}>
-                            <div className="catalog-item-icon">
-                                <Pill size={20} color="#4F8796" />
-                            </div>
-                            <div className="catalog-item-details">
-                                <div className="catalog-item-name">{name}</div>
-                            </div>
-                            <button
-                                className="catalog-item-add-button"
-                                onClick={() => handleCatalogAdd(name)}
-                                disabled={anyLoading}
-                            >
-                                {loadingItem === name
-                                    ? <Loader size={14} className="catalog-spinner" />
-                                    : <Plus size={14} />
-                                }
-                                {loadingItem === name ? 'Завантаження…' : 'Додати'}
-                            </button>
-                        </div>
-                    ))}
-                </div>
+            {showResults && (
+                <>
+                    <div className="catalog-list">
+                        {visibleResults.map((product) => {
+                            const itemKey   = product.id ?? product.name;
+                            const isLoading = loadingId === itemKey;
+                            return (
+                                <div className="catalog-item" key={itemKey}>
+                                    {product.picture ? (
+                                        <div className="catalog-item-img-wrap">
+                                            <img
+                                                src={product.picture}
+                                                alt={product.name}
+                                                className="catalog-item-img"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                    e.currentTarget.parentElement.classList.add('catalog-item-img-wrap--fallback');
+                                                }}
+                                            />
+                                            <Pill size={20} color="#4F8796"
+                                                className="catalog-item-img-fallback-icon"
+                                                style={{ display: 'none' }} />
+                                        </div>
+                                    ) : (
+                                        <div className="catalog-item-icon">
+                                            <Pill size={20} color="#4F8796" />
+                                        </div>
+                                    )}
+
+                                    <div className="catalog-item-details">
+                                        <div className="catalog-item-name">{product.name}</div>
+                                        {(product.dosage || product.producer || product.form) && (
+                                            <div className="catalog-item-meta">
+                                                {[product.dosage, product.form, product.producer]
+                                                    .filter(Boolean).join(' · ')}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <button
+                                        className="catalog-item-add-button"
+                                        onClick={() => handleCatalogAdd(product)}
+                                        disabled={anyLoading}
+                                    >
+                                        {isLoading
+                                            ? <Loader size={14} className="catalog-spinner" />
+                                            : <Plus size={14} />}
+                                        {isLoading ? 'Завантаження…' : 'Додати'}
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Show more button */}
+                    {hiddenCount > 0 && (
+                        <button
+                            className="catalog-show-more"
+                            onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                            disabled={anyLoading}
+                        >
+                            <ChevronDown size={16} />
+                            Показати ще {hiddenCount}
+                        </button>
+                    )}
+                </>
             )}
 
             <div className="add-manual-row">

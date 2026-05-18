@@ -18,7 +18,8 @@ const createMedicinesTable = async () => {
         )
     `);
     // Migrations for existing databases
-    await pool.query(`ALTER TABLE medicines ADD COLUMN IF NOT EXISTS photo TEXT`);
+    await pool.query(`ALTER TABLE medicines ADD COLUMN IF NOT EXISTS photo                 TEXT`);
+    await pool.query(`ALTER TABLE medicines ADD COLUMN IF NOT EXISTS full_description_url  TEXT`);
     await pool.query(`ALTER TABLE medicines ADD COLUMN IF NOT EXISTS expiry_notified_at    TIMESTAMP DEFAULT NULL`);
     await pool.query(`ALTER TABLE medicines ADD COLUMN IF NOT EXISTS low_stock_notified_at TIMESTAMP DEFAULT NULL`);
 };
@@ -40,25 +41,26 @@ const getMedicineById = async (id, userId) => {
 };
 
 const createMedicine = async (userId, data) => {
-    const { name, purpose, dosage, quantity, unit, expiration_date, instructions, photo } = data;
+    const { name, purpose, dosage, quantity, unit, expiration_date, instructions, photo, full_description_url } = data;
     const result = await pool.query(
-        `INSERT INTO medicines (user_id, name, purpose, dosage, quantity, unit, expiration_date, instructions, photo)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        `INSERT INTO medicines (user_id, name, purpose, dosage, quantity, unit, expiration_date, instructions, photo, full_description_url)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
          RETURNING *`,
-        [userId, name, purpose || null, dosage || null, quantity || null, unit || null, expiration_date || null, instructions || null, photo || null]
+        [userId, name, purpose || null, dosage || null, quantity || null, unit || null, expiration_date || null, instructions || null, photo || null, full_description_url || null]
     );
     return result.rows[0];
 };
 
 const updateMedicine = async (id, userId, data) => {
-    const { name, purpose, dosage, quantity, unit, expiration_date, instructions, photo } = data;
+    const { name, purpose, dosage, quantity, unit, expiration_date, instructions, photo, full_description_url } = data;
     const result = await pool.query(
         `UPDATE medicines
          SET name = $1, purpose = $2, dosage = $3, quantity = $4, unit = $5,
-             expiration_date = $6, instructions = $7, photo = $8, updated_at = NOW()
-         WHERE id = $9 AND user_id = $10
+             expiration_date = $6, instructions = $7, photo = $8,
+             full_description_url = $9, updated_at = NOW()
+         WHERE id = $10 AND user_id = $11
          RETURNING *`,
-        [name, purpose || null, dosage || null, quantity || null, unit || null, expiration_date || null, instructions || null, photo ?? null, id, userId]
+        [name, purpose || null, dosage || null, quantity || null, unit || null, expiration_date || null, instructions || null, photo ?? null, full_description_url || null, id, userId]
     );
     return result.rows[0] || null;
 };

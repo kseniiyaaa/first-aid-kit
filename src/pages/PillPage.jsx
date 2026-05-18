@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ImagePlus, X } from 'lucide-react';
+import { ImagePlus, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { authFetch } from '../utils/api.js';
 import { UNITS, displayUnit } from '../utils/units.js';
 import '../styles/PillPage.css';
@@ -71,6 +71,7 @@ export default function PillPage() {
     const [errors,      setErrors]      = useState({});
     const [serverError, setServerError] = useState('');
     const [saveSuccess, setSaveSuccess] = useState(false);
+    const [descOpen,    setDescOpen]    = useState(false);
 
     useEffect(() => {
         authFetch(`/api/medicines/${id}`)
@@ -305,8 +306,29 @@ export default function PillPage() {
                 />
             ) : (
                 <p className="pill-instructions-text">
-                    {medicine.instructions || 'Інструкції не вказані.'}
+                    {medicine.instructions || 'Нотатки не вказані.'}
                 </p>
+            )}
+
+            {/* Full description from ANC API — collapsible iframe */}
+            {medicine.full_description_url && (
+                <div className="pill-api-description">
+                    <button
+                        type="button"
+                        className="pill-api-description-toggle"
+                        onClick={() => setDescOpen((o) => !o)}
+                    >
+                        <span>Детальна інструкція з бази даних</span>
+                        {descOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </button>
+                    {descOpen && (
+                        <iframe
+                            className="pill-api-description-frame"
+                            src={medicine.full_description_url}
+                            title="Інструкція із застосування"
+                        />
+                    )}
+                </div>
             )}
 
             {serverError && <div className="pill-server-error">{serverError}</div>}

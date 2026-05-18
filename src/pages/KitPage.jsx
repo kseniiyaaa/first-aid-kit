@@ -95,9 +95,24 @@ export default function KitPage() {
                             key={medicine.id}
                             onClick={() => navigate(`/pill/${medicine.id}`)}
                         >
-                            <div className="kit-medicine-icon">
-                                <Pill size={20} color="hotpink" />
-                            </div>
+                            {medicine.photo ? (
+                                <div className="kit-medicine-img-wrap">
+                                    <img
+                                        src={medicine.photo}
+                                        alt={medicine.name}
+                                        className="kit-medicine-img"
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                            e.currentTarget.parentElement.classList.add('kit-medicine-img-wrap--fallback');
+                                        }}
+                                    />
+                                    <Pill size={20} color="hotpink" className="kit-medicine-img-fallback" style={{ display: 'none' }} />
+                                </div>
+                            ) : (
+                                <div className="kit-medicine-icon">
+                                    <Pill size={20} color="hotpink" />
+                                </div>
+                            )}
                             <div className="kit-medicine-details">
                                 <div className="kit-medicine-name">{medicine.name}</div>
                                 <div className="kit-medicine-meta">{buildMeta(medicine)}</div>

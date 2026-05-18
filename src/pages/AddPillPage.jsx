@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ImagePlus, X } from 'lucide-react';
+import { ImagePlus, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { authFetch } from '../utils/api.js';
 import { UNITS } from '../utils/units.js';
 import '../styles/AddPillPage.css';
@@ -45,14 +45,29 @@ export default function AddPillPage() {
         expiration_date: '',
         instructions:    '',
     });
-    const [photo,        setPhoto]        = useState(null);
-    const [photoError,   setPhotoError]   = useState('');
-    const [errors,       setErrors]       = useState({});
-    const [serverError,  setServerError]  = useState('');
-    const [isLoading,    setIsLoading]    = useState(false);
-    const [isPrefilled,  setIsPrefilled]  = useState(false);
 
-    // On mount: if navigated from drug search with ?prefill=1, read sessionStorage
+    // photo = base64 string OR https:// URL
+    const [photo,          setPhoto]          = useState(null);
+    const [photoError,     setPhotoError]     = useState('');
+    // URL to full HTML description from ANC API (shown as iframe, not saved to DB)
+    const [apiDescriptionUrl, setApiDescriptionUrl] = useState('');
+    const [descOpen,          setDescOpen]          = useState(false);
+
+    const [errors,          setErrors]          = useState({});
+    const [serverError,     setServerError]     = useState('');
+    const [isLoading,       setIsLoading]       = useState(false);
+    const [isPrefilled,     setIsPrefilled]     = useState(false);
+    const [purposeSuggestions, setPurposeSuggestions] = useState([]);
+
+    // Fetch category suggestions for the Призначення datalist
+    useEffect(() => {
+        authFetch('/api/drug-search/categories')
+            .then(r => r.json())
+            .then(data => setPurposeSuggestions(Array.isArray(data) ? data : []))
+            .catch(() => {});
+    }, []);
+
+    // On mount: read sessionStorage prefill
     useEffect(() => {
         if (searchParams.get('prefill') !== '1') return;
         const raw = sessionStorage.getItem('medikit_add_prefill');
@@ -64,9 +79,12 @@ export default function AddPillPage() {
                 ...prev,
                 name:         data.name         || prev.name,
                 purpose:      data.purpose      || prev.purpose,
+                dosage:       data.dosage       || prev.dosage,
                 instructions: data.instructions || prev.instructions,
                 ...(data.unit ? { unit: data.unit } : {}),
             }));
+            if (data.picture)           setPhoto(data.picture);
+            if (data.apiDescriptionUrl) setApiDescriptionUrl(data.apiDescriptionUrl);
             setIsPrefilled(true);
         } catch { /* ignore parse errors */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -117,9 +135,10 @@ export default function AddPillPage() {
                 method: 'POST',
                 body: JSON.stringify({
                     ...form,
-                    quantity:        form.quantity !== '' ? Number(form.quantity) : null,
-                    expiration_date: form.expiration_date || null,
-                    photo:           photo || null,
+                    quantity:             form.quantity !== '' ? Number(form.quantity) : null,
+                    expiration_date:      form.expiration_date || null,
+                    photo:                photo || null,
+                    full_description_url: apiDescriptionUrl || null,
                 }),
             });
             const data = await res.json();
@@ -209,7 +228,16 @@ export default function AddPillPage() {
                         value={form.purpose}
                         onChange={set('purpose')}
                         disabled={isLoading}
+                        list="purpose-suggestions"
+                        autoComplete="off"
                     />
+                    {purposeSuggestions.length > 0 && (
+                        <datalist id="purpose-suggestions">
+                            {purposeSuggestions.map(s => (
+                                <option key={s} value={s} />
+                            ))}
+                        </datalist>
+                    )}
                 </div>
 
                 <div className="pill-form-field">
@@ -265,16 +293,37 @@ export default function AddPillPage() {
                 </div>
 
                 <div className="pill-form-field">
-                    <label className="pill-form-label">Інструкції</label>
+                    <label className="pill-form-label">Нотатки</label>
                     <textarea
                         className="pill-form-textarea"
                         placeholder="напр., Приймати 1 таблетку кожні 4–6 годин за потреби."
                         value={form.instructions}
                         onChange={set('instructions')}
                         disabled={isLoading}
-                        rows={4}
+                        rows={3}
                     />
                 </div>
+
+                {/* Full description from ANC API — collapsible iframe */}
+                {apiDescriptionUrl && (
+                    <div className="pill-api-description">
+                        <button
+                            type="button"
+                            className="pill-api-description-toggle"
+                            onClick={() => setDescOpen((o) => !o)}
+                        >
+                            <span>Детальна інструкція з бази даних</span>
+                            {descOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        </button>
+                        {descOpen && (
+                            <iframe
+                                className="pill-api-description-frame"
+                                src={apiDescriptionUrl}
+                                title="Інструкція із застосування"
+                            />
+                        )}
+                    </div>
+                )}
 
                 {serverError && <div className="pill-form-server-error">{serverError}</div>}
 

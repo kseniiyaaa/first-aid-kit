@@ -4,147 +4,308 @@ const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ── HTTP helper ───────────────────────────────────────────────────────────────
+// ── In-memory cache ───────────────────────────────────────────────────────────
+const cache = new Map();
+function getCached(key) {
+    const e = cache.get(key);
+    if (!e) return null;
+    if (Date.now() > e.expiry) { cache.delete(key); return null; }
+    return e.value;
+}
+function setCached(key, value, ttlMs) {
+    cache.set(key, { value, expiry: Date.now() + ttlMs });
+    if (cache.size > 300) cache.delete(cache.keys().next().value);
+}
 
-function httpsGetJSON(url) {
+// ── HTTP helpers ──────────────────────────────────────────────────────────────
+function httpsPostJSON(url, payload) {
     return new Promise((resolve, reject) => {
-        https.get(url, { headers: { 'User-Agent': 'MediKit/1.0' } }, (res) => {
-            let body = '';
-            res.on('data', chunk => { body += chunk; });
+        const body   = JSON.stringify(payload);
+        const urlObj = new URL(url);
+        const opts   = {
+            hostname: urlObj.hostname, port: 443,
+            path: urlObj.pathname + urlObj.search, method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(body),
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124',
+                'Accept': 'application/json, */*',
+                'Accept-Language': 'uk-UA,uk;q=0.9',
+                'Origin': 'https://anc.ua', 'Referer': 'https://anc.ua/',
+            },
+        };
+        const req = https.request(opts, (res) => {
+            let data = '';
+            res.on('data', c => { data += c; });
             res.on('end', () => {
-                if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}`));
-                try { resolve(JSON.parse(body)); }
-                catch (e) { reject(e); }
+                try { resolve({ status: res.statusCode, body: JSON.parse(data) }); }
+                catch { reject(new Error('ANC: invalid JSON')); }
             });
-        }).on('error', reject);
+        });
+        req.on('error', reject);
+        req.setTimeout(12000, () => { req.destroy(); reject(new Error('ANC timeout')); });
+        req.write(body); req.end();
     });
 }
 
-
-// ── Text helpers ──────────────────────────────────────────────────────────────
-
-/** Trims a long text to maxChars, always cutting at a word boundary. */
-function truncateAtWord(text, maxChars) {
-    if (!text || text.length <= maxChars) return text || '';
-    const cut       = text.slice(0, maxChars);
-    const lastSpace = cut.lastIndexOf(' ');
-    return (lastSpace > maxChars * 0.6 ? cut.slice(0, lastSpace) : cut) + '…';
+function httpsGetJSON(url) {
+    return new Promise((resolve, reject) => {
+        const opts = {
+            hostname: new URL(url).hostname, port: 443,
+            path: new URL(url).pathname + new URL(url).search, method: 'GET',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 Chrome/124',
+                'Accept': 'application/json',
+                'Origin': 'https://anc.ua', 'Referer': 'https://anc.ua/',
+            },
+        };
+        const req = https.request(opts, (res) => {
+            let data = '';
+            res.on('data', c => { data += c; });
+            res.on('end', () => {
+                try { resolve(JSON.parse(data)); }
+                catch { reject(new Error('ANC categories: invalid JSON')); }
+            });
+        });
+        req.on('error', reject);
+        req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
+        req.end();
+    });
 }
 
-function extractPurpose(text) {
-    if (!text) return '';
-    // Strip leading all-caps section header, e.g. "INDICATIONS AND USAGE\n"
-    const clean = text.replace(/^[A-Z][A-Z\s/&,]+\n+/, '').trim();
-    // Try to return the first complete sentence
-    const m = clean.match(/^[^.!?]+[.!?]/);
-    if (m) return truncateAtWord(m[0].trim(), 220);
-    return truncateAtWord(clean, 200);
+// ── Data helpers ──────────────────────────────────────────────────────────────
+function normalizePicture(pic) {
+    if (!pic || typeof pic !== 'string') return null;
+    let url = pic.trim();
+    if (!url) return null;
+    if (url.startsWith('//'))  url = 'https:' + url;
+    else if (url.startsWith('/')) url = 'https://anc.ua' + url;
+    return url + '.min.webp';
 }
 
-function extractInstructions(text) {
-    if (!text) return '';
-    const clean = text.replace(/^[A-Z][A-Z\s/&,]+\n+/, '').trim();
-    // Try to end on a sentence boundary within 500 chars
-    if (clean.length <= 500) return clean;
-    const cutoff  = clean.slice(0, 500);
-    const lastDot = cutoff.lastIndexOf('.');
-    return lastDot > 300 ? cutoff.slice(0, lastDot + 1) : truncateAtWord(cutoff, 480);
-}
-
-function mapToUnit(dosageForm, route) {
-    const d = (dosageForm || '').toUpperCase();
-    const r = (route      || '').toUpperCase();
-    if (d.includes('TABLET') || d.includes('CAPLET'))                                        return 'tablets';
-    if (d.includes('CAPSULE'))                                                               return 'capsules';
-    if (d.includes('PATCH'))                                                                 return 'patches';
-    if (d.includes('DROP') || r.includes('OPHTHALMIC') || r.includes('OTIC'))               return 'drops';
-    if (d.includes('CREAM') || d.includes('OINTMENT') || d.includes('GEL') || d.includes('LOTION')) return 'g';
-    if (d.includes('SOLUTION') || d.includes('SUSPENSION') || d.includes('LIQUID') || d.includes('SYRUP')) return 'ml';
-    if (d.includes('AMPOULE') || d.includes('VIAL'))                                         return 'ampoules';
-    if (r.includes('ORAL'))                                                                  return 'tablets';
+function mapFormToUnit(form) {
+    if (!form) return null;
+    const f = String(form).toLowerCase();
+    if (f.includes('таблетк') ||
+        f.includes('льод') ||
+        f.includes('пастил'))  return 'tablets';
+    if (f.includes('капсул'))   return 'capsules';
+    if (f.includes('пластир')) return 'patches';
+    if (f.includes('ампул'))          return 'ampoules';
+    if (f.includes('туб'))                      return 'tubes';
+    if (f.includes('крапл') ||
+        f.includes('насто') ||
+        f.includes('насті') ||
+        f.includes('екстр') ||
+        f.includes('олія'))               return 'ml';
+    if (f.includes('гель') ||
+        f.includes('крем') ||
+        f.includes('маз') ||
+        f.includes('лось'))               return 'g';
+    if (f.includes('сироп') ||
+        f.includes('суспенз') ||
+        f.includes('розчин') ||
+        f.includes('емуль') ||
+        f.includes('рідин') ||
+        f.includes('спрей'))         return 'ml';
     return null;
 }
 
-// ── GET /api/drug-search/search?q=aspi ───────────────────────────────────────
-// Primary: openFDA prefix wildcard  →  partial match ("aspi" → "aspirin")
-// Fallback: RxNorm spellingsuggestions  →  fuzzy full-word match
+function extractProducts(body) {
+    if (Array.isArray(body))                   return body;
+    if (Array.isArray(body?.products?.items))  return body.products.items;
+    if (Array.isArray(body?.products))         return body.products;
+    if (Array.isArray(body?.data?.items))      return body.data.items;
+    if (Array.isArray(body?.data))             return body.data;
+    if (Array.isArray(body?.result?.items))    return body.result.items;
+    if (Array.isArray(body?.result))           return body.result;
+    if (Array.isArray(body?.items))            return body.items;
+    return [];
+}
 
+// Root category names to skip when picking "purpose" from the categories array
+const ROOT_CAT_IDS = new Set([1, 2]); // Медикаменти, Медичні вироби (top level)
+
+function purposeFromCategories(cats) {
+    if (!Array.isArray(cats) || cats.length === 0) return '';
+    // Skip root-level entries and pick the most specific one (last non-root)
+    const useful = cats.filter(c => !ROOT_CAT_IDS.has(c.id));
+    if (useful.length === 0) return '';
+    return useful[useful.length - 1].name || '';
+}
+
+// Each entry: [searchPrefix, canonicalDisplayName]
+// Ordered most-specific first to avoid false prefix matches
+const FORM_ENTRIES = [
+    ['супозитор',  'супозиторії'],
+    ['суспенз',    'суспензія'],
+    ['таблетк',    'таблетки'],
+    ['таблета',    'таблетка'],
+    ['капсул',     'капсули'],
+    ['льодяник',   'льодяники'],
+    ['пастил',     'пастилки'],
+    ['настоянка',  'настоянка'],
+    ['настойка',   'настойка'],
+    ['настій',     'настій'],
+    ['екстракт',   'екстракт'],
+    ['сироп',      'сироп'],
+    ['розчин',     'розчин'],
+    ['емульс',     'емульсія'],
+    ['олія',       'олія'],
+    ['крапл',      'краплі'],
+    ['гель',       'гель'],
+    ['крем',       'крем'],
+    ['мазь',       'мазь'],
+    ['лосьйон',    'лосьйон'],
+    ['пластир',    'пластир'],
+    ['ампул',      'ампули'],
+    ['туба',       'туба'],
+    ['спрей',      'спрей'],
+    ['порошок',    'порошок'],
+];
+
+const LIQUID_FORM_PARTS = [
+    'насто',
+    'екстр',
+    'сироп',
+    'розчин',
+    'емуль',
+    'олія',
+    'крапл',
+    'спрей',
+];
+
+function parseFormFromName(name) {
+    const n = (name || '').toLowerCase();
+    for (const [prefix, canonical] of FORM_ENTRIES) {
+        if (n.includes(prefix)) return canonical;
+    }
+    return '';
+}
+
+function parseDosageFromName(name, form) {
+    const isLiquid = LIQUID_FORM_PARTS.some(f => (form || '').toLowerCase().includes(f));
+    if (isLiquid) {
+        const m = (name || '').match(/(\d+(?:[.,]\d+)?\s*(?:мг|г|мкг|%|од\.)(?:\s*\/\s*\S+)?)/i);
+        return m ? m[0].replace(/\s+/, ' ') : '';
+    }
+    const m = (name || '').match(/(\d+(?:[.,]\d+)?\s*(?:мг|г|мл|мкг|%|од\.))/i);
+    return m ? m[0].replace(/\s+/, ' ') : '';
+}
+
+function normalizeProduct(p) {
+    const producerRaw = p.producer ?? p.manufacturer ?? p.brand ?? '';
+    const producer    = typeof producerRaw === 'string' ? producerRaw
+                        : producerRaw?.name || producerRaw?.title || '';
+    const name   = p.name || p.productName || p.title || '';
+    const form   = p.form || p.formName || p.drugForm || p.release_form || parseFormFromName(name);
+    const dosage = p.dosage || p.dose || p.strength || parseDosageFromName(name, form);
+    const purpose = purposeFromCategories(p.categories) ||
+                    p.categoryName || p.category || p.indication || '';
+    return {
+        id:                p.id ?? p.morionId ?? p.productId ?? null,
+        name,
+        picture:           normalizePicture(p.picture ?? p.image ?? p.photo ?? p.img ?? null),
+        dosage,
+        producer,
+        form,
+        unit:              mapFormToUnit(form),
+        purpose,
+        apiDescriptionUrl: p.full_description || p.fullDescription || null,
+    };
+}
+
+// ── Flatten categories tree into a sorted list of subcategory names ───────────
+// Only include descendants of medical/vitamin top-level categories (skip cosmetics, baby gear, etc.)
+const MEDICAL_ROOT_IDS = new Set([1]); // 1 = Медикаменти
+
+function flattenMedicalCategories(topCats, out) {
+    for (const top of (topCats || [])) {
+        if (!MEDICAL_ROOT_IDS.has(top.id)) continue; // skip non-medical roots
+        for (const sub of (top.subcategories || [])) {
+            out.add(sub.name); // level-2 (e.g. "Препарати від застуди")
+            for (const leaf of (sub.subcategories || [])) {
+                out.add(leaf.name); // level-3 (e.g. "Препарати від кашлю")
+            }
+        }
+    }
+}
+
+async function fetchCategoryNames() {
+    const cached = getCached('anc:categories');
+    if (cached) return cached;
+    const data = await httpsGetJSON('https://anc.ua/productbrowser/v2/ua/categories');
+    const out = new Set();
+    flattenMedicalCategories(data?.categories || [], out);
+    const names = [...out].sort((a, b) => a.localeCompare(b, 'uk'));
+    setCached('anc:categories', names, 60 * 60 * 1000); // cache 1 hour
+    return names;
+}
+
+// ── Cities to query in parallel (different regions = different stock = more unique results) ──
+const SEARCH_CITIES = [5, 1, 2, 7, 10, 14, 17, 22];
+
+async function searchCity(q, city) {
+    try {
+        const { status, body } = await httpsPostJSON(
+            'https://anc.ua/productbrowser/v3/ua/search/query',
+            { city, query: q, includeCategory: true, pharmacyPrice: true, source: 'webApp' }
+        );
+        if (status !== 200) return [];
+        return extractProducts(body);
+    } catch {
+        return [];
+    }
+}
+
+// ── GET /api/drug-search/search?q=... ─────────────────────────────────────────
 router.get('/search', requireAuth, async (req, res) => {
     const q = (req.query.q || '').trim();
     if (q.length < 3) return res.json([]);
 
-    const seen    = new Set();
-    const results = [];
+    const cacheKey = `anc:search:${q.toLowerCase()}`;
+    const cached   = getCached(cacheKey);
+    if (cached) return res.json(cached);
 
-    const add = (name) => {
-        const key = (name || '').toLowerCase().trim();
-        if (!key || seen.has(key) || results.length >= 10) return;
-        seen.add(key);
-        results.push(name.charAt(0).toUpperCase() + name.slice(1).toLowerCase());
-    };
-
-    // Strategy 1: openFDA prefix wildcard — works great for partial input
     try {
-        const data = await httpsGetJSON(
-            `https://api.fda.gov/drug/label.json?search=openfda.generic_name:${encodeURIComponent(q)}*&limit=20`
-        );
-        for (const label of (data?.results ?? [])) {
-            for (const name of (label?.openfda?.generic_name ?? [])) add(name);
+        // Query all cities in parallel; ANC hard-limits to 5 per city but different
+        // cities return different products, so we aggregate for more unique results
+        const cityResults = await Promise.all(SEARCH_CITIES.map(city => searchCity(q, city)));
+
+        const seen    = new Set();
+        const merged  = [];
+        for (const items of cityResults) {
+            for (const item of items) {
+                const key = item.id ?? item.name ?? item.productName ?? item.title;
+                if (key && seen.has(String(key))) continue;
+                if (key) seen.add(String(key));
+                merged.push(item);
+                if (merged.length >= 20) break;
+            }
+            if (merged.length >= 20) break;
         }
-    } catch (e) {
-        console.error('openFDA prefix search error:', e.message);
-    }
 
-    // Strategy 2: RxNorm spellingsuggestions — catches typos / different endings
+        const results = merged
+            .map(normalizeProduct)
+            .filter(p => p.name.length > 0);
+
+        setCached(cacheKey, results, 3 * 60 * 1000); // 3 min
+        res.json(results);
+    } catch (err) {
+        console.error('ANC search error:', err.message);
+        res.json([]);
+    }
+});
+
+// ── GET /api/drug-search/categories ──────────────────────────────────────────
+router.get('/categories', requireAuth, async (req, res) => {
     try {
-        const data = await httpsGetJSON(
-            `https://rxnav.nlm.nih.gov/REST/spellingsuggestions.json?name=${encodeURIComponent(q)}`
-        );
-        for (const name of (data?.suggestionGroup?.suggestionList?.suggestion ?? [])) add(name);
-    } catch (e) {
-        console.error('RxNorm spellingsuggestions error:', e.message);
+        const names = await fetchCategoryNames();
+        res.json(names);
+    } catch (err) {
+        console.error('ANC categories error:', err.message);
+        res.json([]);
     }
-
-    res.json(results);
 });
-
-// ── GET /api/drug-search/enrich?name=Aspirin ─────────────────────────────────
-// Returns purpose, instructions, unit + base64 photo (server-downloaded, no CORS).
-
-router.get('/enrich', requireAuth, async (req, res) => {
-    const name = (req.query.name || '').trim();
-    if (!name) return res.status(400).json({ error: 'name required' });
-
-    const fdaLabel = await fetchOpenFDALabel(name);
-
-    const dosageForm = fdaLabel?.openfda?.dosage_form?.[0] ?? '';
-    const route      = fdaLabel?.openfda?.route?.[0]      ?? '';
-
-    res.json({
-        purpose:      extractPurpose(fdaLabel?.indications_and_usage?.[0]),
-        instructions: extractInstructions(fdaLabel?.dosage_and_administration?.[0]),
-        unit:         mapToUnit(dosageForm, route),
-    });
-});
-
-// ── External API helpers ──────────────────────────────────────────────────────
-
-async function fetchOpenFDALabel(name) {
-    const attempts = [
-        `openfda.generic_name:"${name}"`,
-        `openfda.brand_name:"${name}"`,
-        `openfda.substance_name:"${name}"`,
-    ];
-    for (const q of attempts) {
-        try {
-            const data = await httpsGetJSON(
-                `https://api.fda.gov/drug/label.json?search=${encodeURIComponent(q)}&limit=1`
-            );
-            if (data?.results?.[0]) return data.results[0];
-        } catch { /* try next */ }
-    }
-    return null;
-}
-
 
 module.exports = router;
