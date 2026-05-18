@@ -81,7 +81,8 @@ export default function AddPillPage() {
                 purpose:      data.purpose      || prev.purpose,
                 dosage:       data.dosage       || prev.dosage,
                 instructions: data.instructions || prev.instructions,
-                ...(data.unit ? { unit: data.unit } : {}),
+                ...(data.unit     ? { unit:     data.unit }            : {}),
+                ...(data.quantity != null ? { quantity: String(data.quantity) } : {}),
             }));
             if (data.picture)           setPhoto(data.picture);
             if (data.apiDescriptionUrl) setApiDescriptionUrl(data.apiDescriptionUrl);

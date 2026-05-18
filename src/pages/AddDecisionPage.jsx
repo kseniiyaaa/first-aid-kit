@@ -136,11 +136,12 @@ export default function AddDecisionPage() {
         setLoadingId(itemKey);
         sessionStorage.setItem('medikit_add_prefill', JSON.stringify({
             name:              product.name,
-            dosage:            product.dosage  || '',
-            purpose:           product.purpose || '',
-            unit:              product.unit    || null,
-            picture:           product.picture || null,
+            dosage:            product.dosage    || '',
+            purpose:           product.purpose   || '',
+            unit:              product.unit      || null,
+            picture:           product.picture   || null,
             apiDescriptionUrl: product.apiDescriptionUrl || null,
+            quantity:          product.quantity  ?? null,
         }));
         navigate('/add/manual?prefill=1');
     };

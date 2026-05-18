@@ -193,6 +193,12 @@ function parseDosageFromName(name, form) {
     return m ? m[0].replace(/\s+/, ' ') : '';
 }
 
+// Extract package quantity from "№N" in the product name (e.g. "Парацетамол №20" → 20)
+function extractQuantityFromName(name) {
+    const m = (name || '').match(/№\s*(\d+)/);
+    return m ? Number(m[1]) : null;
+}
+
 function normalizeProduct(p) {
     const producerRaw = p.producer ?? p.manufacturer ?? p.brand ?? '';
     const producer    = typeof producerRaw === 'string' ? producerRaw
@@ -211,6 +217,7 @@ function normalizeProduct(p) {
         form,
         unit:              mapFormToUnit(form),
         purpose,
+        quantity:          extractQuantityFromName(name),
         apiDescriptionUrl: p.full_description || p.fullDescription || null,
     };
 }
