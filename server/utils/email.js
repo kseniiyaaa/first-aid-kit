@@ -1,5 +1,19 @@
 const nodemailer = require('nodemailer');
 
+// Unit key → Ukrainian label (mirrors src/utils/units.js)
+const UNIT_LABELS_UK = {
+    tablets:  'таблетки',
+    capsules: 'капсули',
+    ml:       'мл',
+    mg:       'мг',
+    g:        'г',
+    drops:    'краплі',
+    patches:  'пластирі',
+    tubes:    'туби',
+    ampoules: 'ампули',
+};
+const displayUnit = (unit) => UNIT_LABELS_UK[unit] || unit || 'одиниць';
+
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: Number(process.env.EMAIL_PORT) || 587,
@@ -258,7 +272,7 @@ const sendLowStockEmail = async ({ to, name, medicines }) => {
     const rows = medicines.map(m => {
         const qty = m.quantity === 0
             ? '<span style="color:#FB5D60;font-weight:700">Немає в наявності</span>'
-            : `<span style="color:#e67e22;font-weight:700">залишилось ${m.quantity} ${m.unit || 'одиниць'}</span>`;
+            : `<span style="color:#e67e22;font-weight:700">залишилось ${m.quantity} ${displayUnit(m.unit)}</span>`;
         return `
           <tr>
             <td style="padding:10px 12px;border-bottom:1px solid #e9ecef;font-size:14px;color:#212529;font-weight:600">
