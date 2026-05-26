@@ -184,7 +184,7 @@ export default function LogIntakePage() {
                                         disabled={isLoading}
                                     />
                                     {med?.unit && (
-                                        <span className="log-intake-unit">{med.unit}</span>
+                                        <span className="log-intake-unit">{displayUnit(med.unit)}</span>
                                     )}
                                 </div>
 
