@@ -144,9 +144,10 @@ export default function PillPage() {
                 method: 'PUT',
                 body: JSON.stringify({
                     ...form,
-                    quantity:        form.quantity !== '' ? Number(form.quantity) : null,
-                    expiration_date: form.expiration_date || null,
-                    photo:           photo ?? null,
+                    quantity:             form.quantity !== '' ? Number(form.quantity) : null,
+                    expiration_date:      form.expiration_date || null,
+                    photo:                photo ?? null,
+                    full_description_url: medicine.full_description_url || null,
                 }),
             });
             const data = await res.json();

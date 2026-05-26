@@ -345,7 +345,7 @@ router.get('/search', requireAuth, async (req, res) => {
             const merged  = deduplicateProducts(buckets.flat(), 30);
             const results = merged.map(normalizeProduct).filter(p => p.name.length > 0);
 
-            setCached(cacheKey, results, 10 * 60 * 1000); // 10 min
+            if (results.length > 0) setCached(cacheKey, results, 10 * 60 * 1000); // 10 min
             return res.json(results);
         } catch (err) {
             console.error('ANC category search error:', err.message);
@@ -367,7 +367,7 @@ router.get('/search', requireAuth, async (req, res) => {
         const merged  = deduplicateProducts(buckets.flat(), 20);
         const results = merged.map(normalizeProduct).filter(p => p.name.length > 0);
 
-        setCached(cacheKey, results, 3 * 60 * 1000); // 3 min
+        if (results.length > 0) setCached(cacheKey, results, 3 * 60 * 1000); // 3 min
         res.json(results);
     } catch (err) {
         console.error('ANC search error:', err.message);
